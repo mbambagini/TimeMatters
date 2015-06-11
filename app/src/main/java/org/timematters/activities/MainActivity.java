@@ -1,0 +1,712 @@
+package org.timematters.activities;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Color;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBar;
+import android.os.Bundle;
+import android.view.ActionMode;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+
+import android.support.v4.widget.DrawerLayout;
+import android.widget.AdapterView;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import org.timematters.R;
+import org.timematters.adapter.JobAdapter;
+import org.timematters.database.JobEntries;
+import org.timematters.database.JobEntry;
+import org.timematters.exceptions.FileAlreadyPresent;
+import org.timematters.exceptions.JobNotCreated;
+import org.timematters.exceptions.JobNotFound;
+import org.timematters.exceptions.JobsNotSaved;
+import org.timematters.misc.Layouts;
+import org.timematters.misc.States;
+import org.timematters.utils.DateConverter;
+import org.timematters.utils.DateRetriever;
+import org.timematters.utils.JobStorage;
+import org.timematters.utils.XMLexporter;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
+
+public class MainActivity extends ActionBarActivity
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+
+    /**
+     * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
+     */
+    private NavigationDrawerFragment mNavigationDrawerFragment;
+
+    /**
+     * Used to store the last screen title. For use in {@link #restoreActionBar()}.
+     */
+    private CharSequence mTitle;
+
+    private Layouts internal_layout = Layouts.LAYOUT_TRACKING;
+
+    private States  internal_state = States.STATE_IDLE;
+
+    private FrameLayout actual_layout = null;
+    private FrameLayout previous_layout = null;
+
+    private Date first_date = null;
+    private Date second_date = null;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        mNavigationDrawerFragment = (NavigationDrawerFragment)
+                getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
+        mTitle = getTitle();
+
+        if (savedInstanceState == null) {
+            long val = JobStorage.getPendingJob(this, System.currentTimeMillis(), Long.valueOf(-1));
+            if (val!=-1) { // && Preferences.getResumeJob(this)) {
+                //ask if the user wants to resume the previous session
+                internal_state = States.STATE_RUNNING;
+                internal_layout = Layouts.LAYOUT_TRACKING;
+                start_counter(val);
+                JobStorage.removePendingJob(getApplication());
+                Toast.makeText(this, getString(R.string.tst_job_resumed), Toast.LENGTH_LONG).show();
+            }
+        }
+
+        // Set up the drawer.
+        mNavigationDrawerFragment.setUp(
+                R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
+
+        jobs = new JobEntries(getApplicationContext());
+        mementoHandler = new Memento();
+        ListView lst = (ListView)findViewById(R.id.lstJobs);
+        lst.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View view, int arg2, long arg3) {
+                if(mementoHandler.isSelectionMode())
+                    mementoHandler.toggleJob(view);
+            }
+        });
+        lst.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                mementoHandler.toggleJob(view);
+                return true;
+            }
+        });
+
+        setLayout();
+    }
+
+    @Override
+    public void onNavigationDrawerItemSelected(int position) {
+        // update the main content by replacing fragments
+        System.out.println(position);
+        switch (position) {
+            case 0:
+                internal_layout = Layouts.LAYOUT_TRACKING;
+                break;
+            case 1:
+                internal_layout = Layouts.LAYOUT_LIST;
+                first_date = null;
+                second_date = DateRetriever.GetActualDate();
+                fillList(first_date, second_date);
+                break;
+            case 2:
+                internal_layout = Layouts.LAYOUT_LIST;
+                first_date = DateRetriever.GetLastSunday();
+                second_date = DateRetriever.GetActualDate();
+                fillList(first_date, second_date);
+                break;
+            case 3:
+                internal_layout = Layouts.LAYOUT_LIST;
+                first_date = DateRetriever.GetMonthStart();
+                second_date = DateRetriever.GetActualDate();
+                fillList(first_date, second_date);
+                break;
+            case 4:
+                internal_layout = Layouts.LAYOUT_SEARCH;
+                break;
+            case 5:
+                internal_layout = Layouts.LAYOUT_ABOUT;
+                break;
+        }
+        setLayout();
+    }
+
+    public void onClickUpperButtons(View v) {
+        switch (v.getId()) {
+            case R.id.btn_tap_to_start:
+                internal_state = States.STATE_RUNNING;
+                internal_layout = Layouts.LAYOUT_TRACKING;
+                start_counter(0L);
+                setLayout();
+                break;
+            case R.id.btn_stop:
+                internal_state = States.STATE_IDLE;
+                internal_layout = Layouts.LAYOUT_TRACKING;
+                Intent intent = new Intent(this, SaveActivity.class);
+                intent.putExtra(getString(R.string.elapsed_time_id), total_time);
+                startActivity(intent);
+                break;
+            case R.id.btn_pause:
+                internal_state = States.STATE_BLOCKED;
+                internal_layout = Layouts.LAYOUT_TRACKING;
+                setLayout();
+                break;
+            case R.id.btn_tap_to_resume:
+                internal_state = States.STATE_RUNNING;
+                internal_layout = Layouts.LAYOUT_TRACKING;
+                elapsed_time = System.currentTimeMillis();
+                setLayout();
+                break;
+            case R.id.btn_search:
+                DatePicker datePickerFrom = (DatePicker)findViewById(R.id.datePickerSearchFrom);
+                DatePicker datePickerTo = (DatePicker)findViewById(R.id.datePickerSearchUntil);
+                if ((datePickerFrom != null) && (datePickerTo != null)) {
+                    first_date = new Date();
+                    first_date.setYear(datePickerFrom.getYear()-1900);
+                    first_date.setMonth(datePickerFrom.getMonth());
+                    first_date.setDate(datePickerFrom.getDayOfMonth());
+                    first_date.setMinutes(0);
+                    first_date.setHours(0);
+                    second_date = new Date();
+                    second_date.setYear(datePickerTo.getYear()-1900);
+                    second_date.setMonth(datePickerTo.getMonth());
+                    second_date.setDate(datePickerTo.getDayOfMonth());
+                    second_date.setMinutes(0);
+                    second_date.setHours(0);
+                    if (second_date.compareTo(first_date)>=0) {
+                        internal_layout = Layouts.LAYOUT_LIST;
+                        setLayout();
+                        fillList(first_date, second_date);
+                    } else {
+                        Toast.makeText(this, getString(R.string.tst_error_date), Toast.LENGTH_LONG).show();
+                    }
+                }
+                break;
+        }
+    }
+
+    /* show list */
+    private void fillList (Date start, Date stop) {
+        JobEntries jobs = new JobEntries(this);
+        jobs.open();
+        List<JobEntry> list = jobs.getJobs(start, stop);
+        jobs.close();
+        ListView lst = (ListView)findViewById(R.id.lstJobs);
+        LinearLayout details = (LinearLayout)findViewById(R.id.lst_info);
+        TextView txt = (TextView)findViewById(R.id.txt_empty);
+        long total = 0;
+        for (int i=0; (list!=null)&&( i<list.size()); i++)
+            total = total + list.get(i).getDuration();
+        ((TextView)findViewById(R.id.txt_hours)).setText(DateConverter.GetElapsedTime(total));
+        if (list!=null && list.size()>0) {
+            lst.setVisibility(View.VISIBLE);
+            txt.setVisibility(View.GONE);
+            details.setVisibility(View.VISIBLE);
+            JobAdapter adapter = new JobAdapter(this, android.R.layout.simple_list_item_1, list);
+            lst.setAdapter(adapter);
+        } else {
+            lst.setVisibility(View.GONE);
+            txt.setVisibility(View.VISIBLE);
+            details.setVisibility(View.GONE);
+        }
+    }
+
+    private long total_time = 0;
+    private long elapsed_time = 0;
+    private final long period_1s = 1000;
+    private Timer timer = new Timer();
+
+    private void start_counter (long offset) {
+        total_time = offset;
+        elapsed_time = System.currentTimeMillis();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                ticker();
+            }
+        }, 0, period_1s);
+    }
+
+    private void update_time () {
+        if (internal_state==States.STATE_RUNNING) {
+            long curr = System.currentTimeMillis();
+            total_time += curr - elapsed_time;
+            TextView txt = (TextView)findViewById(R.id.txt_time);
+            txt.setText(DateConverter.GetElapsedTime(total_time));
+            elapsed_time = System.currentTimeMillis();
+/*
+            if (notifier!=null && Preferences.getNotificationEnable(this))
+                notifier.update(this, total_time);
+*/
+        }
+    }
+
+    private Runnable tick = new Runnable() {
+        @Override
+        public void run() {
+            update_time();
+        }
+    };
+
+    private void ticker () {
+        this.runOnUiThread(tick);
+    }
+
+    public void onSectionAttached(int number) {
+        switch (number) {
+            case 1:
+                mTitle = getString(R.string.title_home);
+                break;
+            case 2:
+                mTitle = getString(R.string.title_activities);
+                break;
+            /*
+            case 3:
+                mTitle = getString(R.string.title_section3);
+                break;
+            */
+        }
+    }
+
+    public void restoreActionBar() {
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setTitle(mTitle);
+    }
+
+    private void setLayout () {
+        FrameLayout tmp = null;
+        switch (internal_layout) {
+            case LAYOUT_TRACKING:
+                switch(internal_state) {
+                    case STATE_RUNNING:
+                        tmp = (FrameLayout)findViewById(R.id.container_layout_running);
+                        break;
+                    case STATE_BLOCKED:
+                        tmp = (FrameLayout)findViewById(R.id.container_layout_blocked);
+                        break;
+                    case STATE_IDLE:
+                        tmp = (FrameLayout)findViewById(R.id.container_layout_idle);
+                        break;
+                }
+                break;
+            case LAYOUT_SEARCH:
+                tmp = (FrameLayout)findViewById(R.id.container_layout_search);
+                DatePicker datePickerFrom = (DatePicker)findViewById(R.id.datePickerSearchFrom);
+                DatePicker datePickerTo = (DatePicker)findViewById(R.id.datePickerSearchUntil);
+                if ((datePickerFrom!=null) && (datePickerTo!=null)) {
+                    datePickerFrom.setMaxDate(System.currentTimeMillis());
+                    datePickerTo.setMaxDate(System.currentTimeMillis());
+                }
+                break;
+            case LAYOUT_LIST:
+                tmp = (FrameLayout)findViewById(R.id.container_layout_list);
+                break;
+            case LAYOUT_ABOUT:
+                tmp = (FrameLayout)findViewById(R.id.container_layout_about);
+                break;
+        }
+        if (tmp != null) {
+            if (actual_layout != null) {
+                previous_layout = actual_layout;
+                previous_layout.setVisibility(View.GONE);
+            }
+            actual_layout = tmp;
+            actual_layout.setVisibility(View.VISIBLE);
+        }
+        /* to be optimized: do not change the layout when it is the same */
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (!mNavigationDrawerFragment.isDrawerOpen()) {
+            // Only show items in the action bar relevant to this screen
+            // if the drawer is not showing. Otherwise, let the drawer
+            // decide what to show in the action bar.
+            getMenuInflater().inflate(R.menu.main, menu);
+            restoreActionBar();
+            return true;
+        }
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setLayout();
+        if (internal_layout == Layouts.LAYOUT_LIST)
+            fillList(first_date, second_date);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        switch(id) {
+            case R.id.action_share:
+                String msg = buildString();
+                if (msg!=null) {
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, buildString());
+                    sendIntent.setType("text/plain");
+                    startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.action_share)));
+                } else {
+                    Toast.makeText(this, getString(R.string.tst_no_share), Toast.LENGTH_LONG).show();
+                }
+                break;
+            case R.id.action_new:
+                Intent intent = new Intent(this, NewActivity.class);
+                //intent.putExtra(getString(R.string.elapsed_time_id), total_time);
+                startActivity(intent);
+                break;
+            case R.id.action_export:
+                if (first_date==null && second_date==null)
+                    break;
+                JobEntries jobs = new JobEntries(this);
+                jobs.open();
+                final List<JobEntry> list = jobs.getJobs(first_date, second_date);
+                jobs.close();
+                if (list==null || list.size()==0) {
+                    Toast.makeText(getApplicationContext(), getString(R.string.tst_export_empty), Toast.LENGTH_LONG).show();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+                    LayoutInflater inflater = getLayoutInflater();
+
+                    final View view = inflater.inflate(R.layout.filename_input_dialog, null);
+
+                    builder.setView(view)
+                            .setCancelable(true)
+                            .setPositiveButton(getString(R.string.text_save), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int id) {
+                                    try {
+                                        EditText filename = (EditText)view.findViewById(R.id.input_filename);
+                                        if (filename == null) {
+                                            Toast.makeText(getApplicationContext(), getString(R.string.tst_export_no), Toast.LENGTH_LONG).show();
+                                            System.out.println("no read");
+                                            return;
+                                        }
+                                        System.out.println(filename.getText().toString());
+                                        XMLexporter exporter = new XMLexporter(list, first_date, second_date);
+                                        exporter.saveToFile(filename.getText().toString(), getApplicationContext());
+                                        Toast.makeText(getApplicationContext(), getString(R.string.tst_export_ok), Toast.LENGTH_LONG).show();
+                                    } catch (JobsNotSaved e) {
+                                        System.out.println("NO");
+                                        Toast.makeText(getApplicationContext(), getString(R.string.tst_export_no), Toast.LENGTH_LONG).show();
+                                    } catch (FileAlreadyPresent e) {
+                                        System.out.println("present");
+                                        Toast.makeText(getApplicationContext(), getString(R.string.tst_export_already), Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            })
+                            .setNegativeButton(getString(R.string.text_cancel), new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            });
+                    builder.create().show();
+                }
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+   }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (internal_state==States.STATE_RUNNING || internal_state==States.STATE_RUNNING)
+            JobStorage.setPendingJob(this, total_time, System.currentTimeMillis());
+        else
+            JobStorage.removePendingJob(this);
+    }
+
+    private Memento mementoHandler;
+    private JobEntries jobs;
+
+    private class Memento {
+        private ActionMode mActionMode = null;
+
+        private ArrayList<View> selectedViews = null;
+        private ArrayList<Integer> selectedJobs = null;
+
+        private ArrayList<JobEntry> memento = null;
+
+        synchronized public boolean isSelectionMode () {
+            return mActionMode!=null;
+        }
+
+        synchronized public void toggleJob (View v) {
+            if (memento!=null)
+                return;
+            if (mActionMode==null) {
+                mActionMode = MainActivity.this.startActionMode(actionModeCallback);
+                selectedJobs = null;
+                selectedViews = null;
+            }
+            if (selectedViews!=null && selectedViews.indexOf(v)!=-1)
+                deselectJob(v);
+            else
+                selectJob(v);
+            if (selectedViews != null)
+                mActionMode.setTitle(Integer.toString(selectedViews.size()));
+        }
+
+        synchronized private void selectJob (View v) {
+            TextView txt = (TextView)v.findViewById(R.id.txt_job_id);
+            if (txt==null)
+                return;
+            if (selectedJobs==null)
+                selectedJobs = new ArrayList<Integer>();
+            if (selectedViews==null)
+                selectedViews = new ArrayList<View>();
+            selectedJobs.add(Integer.parseInt(txt.getText().toString()));
+            selectedViews.add(v);
+            v.setSelected(true);
+            v.setBackgroundColor(getResources().getColor(R.color.selected_job));
+        }
+
+        synchronized private void deselectJob (View v) {
+            TextView txt = (TextView)v.findViewById(R.id.txt_job_id);
+            if (txt==null) {
+                mActionMode.finish();
+                return;
+            }
+            if (selectedJobs!=null) {
+                Integer val = Integer.parseInt(txt.getText().toString());
+                for(int i=0; i<selectedJobs.size(); i++)
+                    if (selectedJobs.get(i).compareTo(val)==0) {
+                        selectedJobs.remove(i);
+                        break;
+                    }
+            }
+            if (selectedViews!=null)
+                selectedViews.remove(v);
+            v.setBackgroundColor(Color.TRANSPARENT);
+            v.setSelected(false);
+            if (selectedJobs!=null && selectedJobs.size()==0)
+                mActionMode.finish();
+        }
+
+        private int deletedCount = 0;
+
+        synchronized public int getDeletedJobs () {
+            return deletedCount;
+        }
+
+        synchronized public int getSelectedJobs () {
+            if (selectedJobs!=null)
+                return selectedJobs.size();
+            return 0;
+        }
+
+        private void deleteJobs () {
+            deletedCount = 0;
+            if (memento==null)
+                memento = new ArrayList<JobEntry>();
+            else
+                memento.clear();
+            jobs.open();
+            for (Integer i: selectedJobs) {
+                try {
+                    JobEntry j = jobs.getJob(i);
+                    memento.add(j);
+                    jobs.deleteJob(j);
+                    deletedCount++;
+                } catch (JobNotFound e) {
+                }
+            }
+            jobs.close();
+        }
+
+        synchronized public void deleteSelectedJobs () {
+            if (selectedJobs!=null) {
+                deletedCount = 0;
+                deleteJobs();
+                mActionMode.finish();
+            }
+        }
+
+        synchronized public void discardData () {
+            memento = null;
+        }
+
+        synchronized public void destroyMode () {
+            if (selectedViews!=null)
+                for (View v: selectedViews) {
+                    if (v!=null) {
+                        v.setBackgroundColor(Color.TRANSPARENT);
+                        v.setSelected(false);
+                    }
+                }
+            selectedViews = null;
+            selectedJobs = null;
+            mActionMode = null;
+        }
+
+        synchronized public void ignoreAction () {
+            mActionMode.finish();
+        }
+
+        synchronized public boolean undo () {
+            boolean ret = true;
+            if (memento==null)
+                return false;
+            jobs.open();
+            for (JobEntry j: memento) {
+                try {
+                    jobs.restoreJob(j);
+                } catch (JobNotCreated exp) {
+                    ret = false;
+                }
+            }
+            jobs.close();
+            memento = null;
+            return ret;
+        }
+    };
+
+    private ActionMode.Callback actionModeCallback = new ActionMode.Callback() {
+
+        // Called when the action mode is created; startActionMode() was called
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.dynamic_action_bar_job_list, menu);
+            return true;
+        }
+
+        // Called each time the action mode is shown. Always called after
+        // onCreateActionMode, but
+        // may be called multiple times if the mode is invalidated.
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        // Called when the user selects a contextual menu item
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.menuItemDelete:
+                    deleteJobs();
+                    return true;
+            }
+            return false;
+        }
+
+        // Called when the user exits the action mode
+        public void onDestroyActionMode(ActionMode mode) {
+            mementoHandler.destroyMode();
+        }
+    };
+
+    private AlertDialog dialogDeleteExam = null;
+
+    private void deleteJobs () {
+        mementoHandler.deleteSelectedJobs();
+        jobs.close();
+        fillList(null, DateRetriever.GetActualDate());
+        showUndo();
+    }
+
+    private void showUndo () {
+        //findViewById(R.id.sample_content_fragment).setVisibility(View.GONE);
+        final View view = (View)findViewById(R.id.undobar);
+        view.setVisibility(View.VISIBLE);
+        view.setAlpha(1);
+        TextView txt = (TextView)view.findViewById(R.id.txtSumDelete);
+        if (txt!=null)
+            txt.setText(getResources().getString(R.string.msg_deleted) + " " +
+                            String.valueOf(mementoHandler.getDeletedJobs())+" "+
+                            (mementoHandler.getDeletedJobs()==1?
+                                    getResources().getString(R.string.msg_activity) :
+                                    getResources().getString(R.string.msg_activities)
+                            )
+            );
+        fillList(first_date, second_date);
+        view.animate().alpha(0.4f).setDuration(5000).withEndAction(new Runnable() {
+            @Override
+            synchronized public void run() {
+                view.setVisibility(View.GONE);
+                fillList(first_date, second_date);
+//                if (internal_layout==Layouts.LAYOUT_LIST)
+//                    findViewById(R.id.sample_content_fragment).setVisibility(View.VISIBLE);
+                mementoHandler.discardData();
+            }
+        });
+    }
+
+    public void undoDelection (View view) {
+        findViewById(R.id.undobar).setVisibility(View.GONE);
+//        findViewById(R.id.sample_content_fragment).setVisibility(View.VISIBLE);
+        if (mementoHandler.undo()) {
+            fillList(first_date, second_date);
+        } else
+            Toast.makeText(getApplicationContext(),
+                    getResources().getString(R.string.msg_undo_not_possible),
+                    Toast.LENGTH_SHORT).show();
+    }
+
+    private String buildString () {
+        if (first_date==null && second_date==null)
+            return null;
+
+        String body = new String();
+        long total = 0;
+        JobEntries jobs = new JobEntries(this);
+        jobs.open();
+        List<JobEntry> list = jobs.getJobs(first_date, second_date);
+        jobs.close();
+        if (list==null || list.size()==0) {
+            body = new String("No activity stored");
+        } else {
+            for (int i=0; (list!=null)&&( i<list.size()); i++) {
+                JobEntry entry = list.get(i);
+                if (entry != null) {
+                    body = body + new String(DateConverter.GetPreferenceDateFormat(entry.getStop()) +
+                            ":  " + DateConverter.GetElapsedTime(entry.getDuration()) + "\n");
+                    total += entry.getDuration();
+                }
+            }
+        }
+
+        String header;
+        if (first_date==null) {
+            header = new String("All activities until " +
+                    DateConverter.GetPreferenceDateFormat(second_date) +
+                    " (total time "+DateConverter.GetElapsedTime(total) + "):\n");
+        } else {
+            header = new String("All activities from " +
+                    DateConverter.GetPreferenceDateFormat(first_date) + " to "+
+                    DateConverter.GetPreferenceDateFormat(second_date) + " (total time " +
+                    DateConverter.GetElapsedTime(total)+"):\n");
+        }
+
+        return new String(header+body);
+    }
+}

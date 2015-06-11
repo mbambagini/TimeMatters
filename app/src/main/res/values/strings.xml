@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="text_from">From</string>
+    <string name="text_to">To</string>
+    <string name="text_search">Search</string>
+
+    <string name="text_space"> - </string>
+
+    <string name="app_name">TimeMatters</string>
+    <string name="app_version">v1.0</string>
+    <string name="title_home">Home</string>
+    <string name="title_activities">All activities</string>
+    <string name="title_this_week">This week</string>
+    <string name="title_this_month">This month</string>
+    <string name="title_search">Search</string>
+    <string name="title_about">About</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_share">Share...</string>
+    <string name="action_save">Save</string>
+    <string name="action_new">Add activity</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_export">Export as XML</string>
+    <string name="action_import">Import XML</string>
+
+    <string name="msg_error_saving">Impossible to save the activity</string>
+    <string name="msg_save_ok">Activity successfully saved</string>
+
+    <string name="msg_thanks_1">Thank you</string>
+    <string name="msg_thanks_2">for using</string>
+    <string name="msg_thanks_3">Your feedback is important</string>
+
+    <string name="text_when">When</string>
+    <string name="text_hours">Total time</string>
+
+    <!-- tap to start -->
+    <string name="txt_tap_to_start">Tap to start</string>
+
+    <!-- tap to resume -->
+    <string name="txt_tap_to_resume">Tap to resume</string>
+
+    <!-- Button text -->
+    <string name="text_pause">Pause</string>
+    <string name="text_stop">Stop</string>
+    <string name="text_save">Save</string>
+    <string name="text_cancel">Cancel</string>
+    <string name="text_resume">Resume</string>
+    <string name="text_filename">Filename...</string>
+    <string name="text_delete">Delete</string>
+    <string name="text_elapsed_time">Elapsed time</string>
+    <string name="text_for">for</string>
+    <string name="title_activity_save">SaveActivity</string>
+
+    <!-- Intent's info exchanged -->
+    <string name="elapsed_time_id">elapsed_time_id</string>
+    <string name="text_note">Note</string>
+    <string name="text_elapsed_when">On</string>
+    <string name="text_total_hours">Overall worked time</string>
+    <string name="text_empty">No saved activity</string>
+    <string name="msg_deleted">Deleted</string>
+    <string name="msg_activity">activity</string>
+    <string name="msg_activities">activities</string>
+    <string name="msg_undo_not_possible">Error while restoring activities</string>
+    <string name="hint_note">Type your note here...</string>
+
+    <!-- Toast messages -->
+    <string name="tst_event_created">Entry successfully saved</string>
+    <string name="tst_error_date">Second date must be greater than the first</string>
+    <string name="tst_event_not_created">Entry not saved</string>
+    <string name="tst_job_resumed">Activity resumed</string>
+    <string name="title_activity_new">NewActivity</string>
+    <string name="tst_no_share">Impossible to share activities</string>
+    <string name="hello_world">Hello world!</string>
+
+    <string name="tst_export_ok">Activities saved successfully</string>
+    <string name="tst_export_no">Impossible to save the file</string>
+    <string name="tst_export_already">The file already exists</string>
+    <string name="tst_export_empty">No activity to save</string>
+
+
+</resources>
