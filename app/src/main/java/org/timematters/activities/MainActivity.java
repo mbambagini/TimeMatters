@@ -28,7 +28,6 @@ import org.timematters.R;
 import org.timematters.adapter.JobAdapter;
 import org.timematters.database.JobEntries;
 import org.timematters.database.JobEntry;
-import org.timematters.exceptions.FileAlreadyPresent;
 import org.timematters.exceptions.JobNotCreated;
 import org.timematters.exceptions.JobNotFound;
 import org.timematters.exceptions.JobsNotSaved;
@@ -418,11 +417,20 @@ public class MainActivity extends ActionBarActivity
                                         exporter.saveToFile(filename.getText().toString(), getApplicationContext());
                                         Toast.makeText(getApplicationContext(), getString(R.string.tst_export_ok), Toast.LENGTH_LONG).show();
                                     } catch (JobsNotSaved e) {
-                                        System.out.println("NO");
-                                        Toast.makeText(getApplicationContext(), getString(R.string.tst_export_no), Toast.LENGTH_LONG).show();
-                                    } catch (FileAlreadyPresent e) {
-                                        System.out.println("present");
-                                        Toast.makeText(getApplicationContext(), getString(R.string.tst_export_already), Toast.LENGTH_LONG).show();
+                                        int tmp_id;
+                                        switch (e.getError()) {
+                                            case FileAlreadyExists:
+                                                tmp_id = R.string.tst_export_already;
+                                                break;
+                                            case MediaNotMounted:
+                                                tmp_id = R.string.tst_export_unmount;
+                                                break;
+                                            case GenericError:
+                                            default:
+                                                tmp_id = R.string.tst_export_no;
+                                                break;
+                                        }
+                                        Toast.makeText(getApplicationContext(), getString(tmp_id), Toast.LENGTH_LONG).show();
                                     }
                                 }
                             })

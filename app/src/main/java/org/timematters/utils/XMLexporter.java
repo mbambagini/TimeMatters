@@ -5,8 +5,8 @@ import android.os.Environment;
 import android.widget.Toast;
 
 import org.timematters.database.JobEntry;
-import org.timematters.exceptions.FileAlreadyPresent;
 import org.timematters.exceptions.JobsNotSaved;
+import org.timematters.misc.SavingProblems;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -45,32 +45,29 @@ public class XMLexporter {
         return false;
     }
 
-    public void saveToFile(String filename, Context c) throws JobsNotSaved, FileAlreadyPresent {
-        System.out.println("A");
+    public void saveToFile(String filename, Context c) throws JobsNotSaved {
+        Toast.makeText(c, "A", Toast.LENGTH_LONG).show();
 
         if (jobs==null)
-            throw new JobsNotSaved();
-        System.out.println("B");
+            throw new JobsNotSaved(SavingProblems.GenericError);
 
-        if (!isExternalStorageWritable()) {
-            Toast.makeText(c, "NO WRT", Toast.LENGTH_LONG).show();
-            throw new JobsNotSaved();
-        }
-        System.out.println("C");
+        Toast.makeText(c, "B", Toast.LENGTH_LONG).show();
+
+        if (!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()))
+            throw new JobsNotSaved(SavingProblems.MediaNotMounted);
 
         File file = new File(c.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), filename);
         file.mkdirs();
-        System.out.println("D");
+
         try {
             //Create instance of DocumentBuilderFactory
-            System.out.println("G");
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             //Get the DocumentBuilder
             DocumentBuilder builder = factory.newDocumentBuilder();
             //Create blank DOM Document
             Document doc = builder.newDocument();
             //create the root element
-            Element root = doc.createElement("Jobs");
+            Element root = doc.createElement("Activities");
             root.setAttribute("from", String.valueOf(date_first==null?-1:date_first.getTime()));
             root.setAttribute("to", String.valueOf(date_second==null?-1:date_second.getTime()));
             //create a comment
@@ -82,7 +79,7 @@ public class XMLexporter {
             System.out.println("H");
             for (int i=0; i<jobs.size(); i++) {
                 //create child element
-                Element element = doc.createElement("job");
+                Element element = doc.createElement("activity");
                 //Add the attribute to the child
                 element.setAttribute("id", String.valueOf(jobs.get(i).getId()));
                 element.setAttribute("stop", String.valueOf(jobs.get(i).getStop()));
@@ -99,11 +96,9 @@ public class XMLexporter {
             transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
             transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "roles.dtd");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-            System.out.println("I");
             DOMSource source = new DOMSource(doc);
             FileOutputStream _stream = new FileOutputStream(file);
             StreamResult result = new StreamResult(_stream);
-            System.out.println("L");
             transformer.transform(source, result);
         } catch (Exception e) {
             throw new JobsNotSaved();
