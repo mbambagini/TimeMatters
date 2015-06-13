@@ -6,5 +6,6 @@ package org.timematters.misc;
 public enum SavingProblems {
     GenericError,
     MediaNotMounted,
-    FileAlreadyExists
+    FileAlreadyExists,
+    FileNotCreated
 }

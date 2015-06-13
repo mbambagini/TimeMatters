@@ -13,6 +13,7 @@ import org.w3c.dom.Element;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -25,13 +26,13 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 
-public class XMLexporter {
+public class XMLBuilder {
 
     private List<JobEntry> jobs = null;
     private Date date_first = null;
     private Date date_second = null;
 
-    public XMLexporter (List<JobEntry> jobList, Date from, Date to) {
+    public XMLBuilder(List<JobEntry> jobList, Date from, Date to) {
         jobs = jobList;
         date_first = from;
         date_second = to;
@@ -45,19 +46,20 @@ public class XMLexporter {
         return false;
     }
 
-    public void saveToFile(String filename, Context c) throws JobsNotSaved {
-        Toast.makeText(c, "A", Toast.LENGTH_LONG).show();
-
-        if (jobs==null)
+    public void create(String filename, Context c) throws JobsNotSaved {
+       if (jobs==null)
             throw new JobsNotSaved(SavingProblems.GenericError);
 
-        Toast.makeText(c, "B", Toast.LENGTH_LONG).show();
-
-        if (!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()))
+        if (!isExternalStorageWritable())
             throw new JobsNotSaved(SavingProblems.MediaNotMounted);
 
         File file = new File(c.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), filename);
-        file.mkdirs();
+        try {
+            file.mkdirs();
+            file.createNewFile();
+        } catch (IOException e) {
+            throw new JobsNotSaved(SavingProblems.FileNotCreated);
+        }
 
         try {
             //Create instance of DocumentBuilderFactory
@@ -76,7 +78,6 @@ public class XMLexporter {
             root.appendChild(comment);
             //all it to the xml tree
             doc.appendChild(root);
-            System.out.println("H");
             for (int i=0; i<jobs.size(); i++) {
                 //create child element
                 Element element = doc.createElement("activity");

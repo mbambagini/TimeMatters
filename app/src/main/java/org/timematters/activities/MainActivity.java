@@ -36,7 +36,7 @@ import org.timematters.misc.States;
 import org.timematters.utils.DateConverter;
 import org.timematters.utils.DateRetriever;
 import org.timematters.utils.JobStorage;
-import org.timematters.utils.XMLexporter;
+import org.timematters.utils.XMLBuilder;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -343,7 +343,17 @@ public class MainActivity extends ActionBarActivity
             // Only show items in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
-            getMenuInflater().inflate(R.menu.main, menu);
+            switch (internal_layout) {
+                case LAYOUT_LIST:
+                    getMenuInflater().inflate(R.menu.main, menu);
+                    break;
+                case LAYOUT_SEARCH:
+                case LAYOUT_TRACKING:
+                case LAYOUT_ABOUT:
+                default:
+                    getMenuInflater().inflate(R.menu.main_reduced, menu);
+                    break;
+            }
             restoreActionBar();
             return true;
         }
@@ -380,10 +390,12 @@ public class MainActivity extends ActionBarActivity
                 }
                 break;
             case R.id.action_new:
+            case R.id.action_new_reduced:
                 Intent intent = new Intent(this, NewActivity.class);
                 //intent.putExtra(getString(R.string.elapsed_time_id), total_time);
                 startActivity(intent);
                 break;
+/*
             case R.id.action_export:
                 if (first_date==null && second_date==null)
                     break;
@@ -413,8 +425,8 @@ public class MainActivity extends ActionBarActivity
                                             return;
                                         }
                                         System.out.println(filename.getText().toString());
-                                        XMLexporter exporter = new XMLexporter(list, first_date, second_date);
-                                        exporter.saveToFile(filename.getText().toString(), getApplicationContext());
+                                        XMLBuilder exporter = new XMLBuilder(list, first_date, second_date);
+                                        exporter.create(filename.getText().toString(), getApplicationContext());
                                         Toast.makeText(getApplicationContext(), getString(R.string.tst_export_ok), Toast.LENGTH_LONG).show();
                                     } catch (JobsNotSaved e) {
                                         int tmp_id;
@@ -442,6 +454,7 @@ public class MainActivity extends ActionBarActivity
                     builder.create().show();
                 }
                 break;
+*/
         }
 
         return super.onOptionsItemSelected(item);
