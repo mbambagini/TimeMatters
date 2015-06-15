@@ -385,66 +385,6 @@ public class MainActivity extends ActionBarActivity
                 //intent.putExtra(getString(R.string.elapsed_time_id), total_time);
                 startActivity(intent);
                 break;
-/*
-            case R.id.action_export:
-                if (first_date==null && second_date==null)
-                    break;
-                JobEntries jobs = new JobEntries(this);
-                jobs.open();
-                final List<JobEntry> list = jobs.getJobs(first_date, second_date);
-                jobs.close();
-                if (list==null || list.size()==0) {
-                    Toast.makeText(getApplicationContext(), getString(R.string.tst_export_empty), Toast.LENGTH_LONG).show();
-                } else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-                    LayoutInflater inflater = getLayoutInflater();
-
-                    final View view = inflater.inflate(R.layout.filename_input_dialog, null);
-
-                    builder.setView(view)
-                            .setCancelable(true)
-                            .setPositiveButton(getString(R.string.text_save), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int id) {
-                                    try {
-                                        EditText filename = (EditText)view.findViewById(R.id.input_filename);
-                                        if (filename == null) {
-                                            Toast.makeText(getApplicationContext(), getString(R.string.tst_export_no), Toast.LENGTH_LONG).show();
-                                            System.out.println("no read");
-                                            return;
-                                        }
-                                        System.out.println(filename.getText().toString());
-                                        XMLBuilder exporter = new XMLBuilder(list, first_date, second_date);
-                                        exporter.create(filename.getText().toString(), getApplicationContext());
-                                        Toast.makeText(getApplicationContext(), getString(R.string.tst_export_ok), Toast.LENGTH_LONG).show();
-                                    } catch (JobsNotSaved e) {
-                                        int tmp_id;
-                                        switch (e.getError()) {
-                                            case FileAlreadyExists:
-                                                tmp_id = R.string.tst_export_already;
-                                                break;
-                                            case MediaNotMounted:
-                                                tmp_id = R.string.tst_export_unmount;
-                                                break;
-                                            case GenericError:
-                                            default:
-                                                tmp_id = R.string.tst_export_no;
-                                                break;
-                                        }
-                                        Toast.makeText(getApplicationContext(), getString(tmp_id), Toast.LENGTH_LONG).show();
-                                    }
-                                }
-                            })
-                            .setNegativeButton(getString(R.string.text_cancel), new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
-                                }
-                            });
-                    builder.create().show();
-                }
-                break;
-*/
         }
 
         return super.onOptionsItemSelected(item);
