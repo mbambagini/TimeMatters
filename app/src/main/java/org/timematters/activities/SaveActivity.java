@@ -2,8 +2,6 @@ package org.timematters.activities;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -12,7 +10,7 @@ import org.timematters.R;
 import org.timematters.database.JobEntries;
 import org.timematters.database.JobEntry;
 import org.timematters.exceptions.JobNotCreated;
-import org.timematters.utils.DateConverter;
+import org.timematters.utils.DateHandler;
 
 import java.util.Date;
 
@@ -38,9 +36,9 @@ public class SaveActivity extends ActionBarActivity {
 
         Date actual_date = new Date();
         duration = getIntent().getExtras().getLong(getString(R.string.elapsed_time_id));
-        internal_date = DateConverter.GetSQLDateFormat(actual_date);
-        txt_when.setText(DateConverter.GetPreferenceDateFormat(actual_date));
-        txt_duration.setText(DateConverter.GetElapsedTime(duration));
+        internal_date = DateHandler.GetSQLDateFormat(actual_date);
+        txt_when.setText(DateHandler.GetPreferenceDateFormat(actual_date));
+        txt_duration.setText(DateHandler.GetElapsedTime(duration));
     }
 
     /*!

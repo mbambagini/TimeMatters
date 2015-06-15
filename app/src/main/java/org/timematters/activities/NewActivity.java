@@ -1,6 +1,5 @@
 package org.timematters.activities;
 
-import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -15,7 +14,7 @@ import org.timematters.R;
 import org.timematters.database.JobEntries;
 import org.timematters.database.JobEntry;
 import org.timematters.exceptions.JobNotCreated;
-import org.timematters.utils.DateConverter;
+import org.timematters.utils.DateHandler;
 
 import java.util.Date;
 
@@ -87,7 +86,7 @@ public class NewActivity extends ActionBarActivity {
         date.setDate(datePicker.getDayOfMonth());
         date.setMinutes(0);
         date.setHours(0);
-        job.setStop(DateConverter.GetSQLDateFormat(date));
+        job.setStop(DateHandler.GetSQLDateFormat(date));
         job.setDuration(duration);
         System.out.println(date.getTime());
         try {

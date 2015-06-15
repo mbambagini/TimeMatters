@@ -11,7 +11,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
-import org.timematters.utils.DateConverter;
+import org.timematters.utils.DateHandler;
 import org.timematters.exceptions.JobNotCreated;
 import org.timematters.exceptions.JobNotFound;
 
@@ -48,10 +48,10 @@ public class JobEntries {
     public List<JobEntry> getJobs(Date start, Date stop) {
         String orderByClause = new String (DBHelper.COLUMN_STOP+" DESC");
         String whereClause = new String (DBHelper.COLUMN_STOP + "<= \'" +
-                                                       DateConverter.GetSQLDateFormat(stop) + "\'");
+                                                       DateHandler.GetSQLDateFormat(stop) + "\'");
         if (start!=null)
             whereClause += new String (" AND " + DBHelper.COLUMN_STOP + ">= \'" +
-                                                      DateConverter.GetSQLDateFormat(start) + "\'");
+                                                      DateHandler.GetSQLDateFormat(start) + "\'");
         Cursor cursor = db.query(DBHelper.TABLE_JOBS, allJobColumns, whereClause, null, null, null,
                                                                                      orderByClause);
         if (cursor.getCount()==0)

@@ -1,15 +1,11 @@
 package org.timematters.utils;
 
-import android.widget.TextView;
-
-import org.timematters.R;
-
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
-public class DateConverter {
-
+public class DateHandler {
 
     static public String GetElapsedTime (long duration) {
         DecimalFormat formatter = new DecimalFormat("00");
@@ -22,10 +18,8 @@ public class DateConverter {
         long hours = duration;
 
         if (hours>99)
-            return new String(formatterHours.format(hours)+":" +formatter.format(minutes) + ":" +
-                            formatter.format(seconds));
-        return new String(formatter.format(hours)+":" +formatter.format(minutes) + ":" +
-                formatter.format(seconds));
+            return formatterHours.format(hours)+":" +formatter.format(minutes) + ":" + formatter.format(seconds);
+        return formatter.format(hours)+":" +formatter.format(minutes) + ":" + formatter.format(seconds);
     }
 
     static public String GetSQLDateFormat (Date date) {
@@ -45,6 +39,23 @@ public class DateConverter {
 
     static public String GetTimeFormat (int hour, int minute) {
         DecimalFormat formatter = new DecimalFormat("00");
-        return new String(formatter.format(hour)+":"+formatter.format(minute));
+        return formatter.format(hour)+":"+formatter.format(minute);
+    }
+
+    static public Date GetMonthStart () {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        return cal.getTime();
+    }
+
+    static public Date GetActualDate () {
+        return new Date();
+    }
+
+    static public Date GetLastSunday () {
+        Calendar cal = Calendar.getInstance();
+        int day = cal.get(Calendar.DAY_OF_WEEK);
+        cal.add(Calendar.DAY_OF_WEEK, Calendar.SUNDAY - day);
+        return cal.getTime();
     }
 }

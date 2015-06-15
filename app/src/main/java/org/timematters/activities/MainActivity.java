@@ -1,14 +1,11 @@
 package org.timematters.activities;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
 import android.view.ActionMode;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,7 +14,6 @@ import android.view.View;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.AdapterView;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -30,13 +26,10 @@ import org.timematters.database.JobEntries;
 import org.timematters.database.JobEntry;
 import org.timematters.exceptions.JobNotCreated;
 import org.timematters.exceptions.JobNotFound;
-import org.timematters.exceptions.JobsNotSaved;
 import org.timematters.misc.Layouts;
 import org.timematters.misc.States;
-import org.timematters.utils.DateConverter;
-import org.timematters.utils.DateRetriever;
+import org.timematters.utils.DateHandler;
 import org.timematters.utils.JobStorage;
-import org.timematters.utils.XMLBuilder;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -63,7 +56,7 @@ public class MainActivity extends ActionBarActivity
     private States  internal_state = States.STATE_IDLE;
 
     private FrameLayout actual_layout = null;
-    private FrameLayout previous_layout = null;
+
 
     private Date first_date = null;
     private Date second_date = null;
@@ -78,7 +71,7 @@ public class MainActivity extends ActionBarActivity
         mTitle = getTitle();
 
         if (savedInstanceState == null) {
-            long val = JobStorage.getPendingJob(this, System.currentTimeMillis(), Long.valueOf(-1));
+            long val = JobStorage.getPendingJob(this, System.currentTimeMillis(), -1);
             if (val!=-1) { // && Preferences.getResumeJob(this)) {
                 //ask if the user wants to resume the previous session
                 internal_state = States.STATE_RUNNING;
@@ -125,19 +118,19 @@ public class MainActivity extends ActionBarActivity
             case 1:
                 internal_layout = Layouts.LAYOUT_LIST;
                 first_date = null;
-                second_date = DateRetriever.GetActualDate();
+                second_date = DateHandler.GetActualDate();
                 fillList(first_date, second_date);
                 break;
             case 2:
                 internal_layout = Layouts.LAYOUT_LIST;
-                first_date = DateRetriever.GetLastSunday();
-                second_date = DateRetriever.GetActualDate();
+                first_date = DateHandler.GetLastSunday();
+                second_date = DateHandler.GetActualDate();
                 fillList(first_date, second_date);
                 break;
             case 3:
                 internal_layout = Layouts.LAYOUT_LIST;
-                first_date = DateRetriever.GetMonthStart();
-                second_date = DateRetriever.GetActualDate();
+                first_date = DateHandler.GetMonthStart();
+                second_date = DateHandler.GetActualDate();
                 fillList(first_date, second_date);
                 break;
             case 4:
@@ -216,7 +209,7 @@ public class MainActivity extends ActionBarActivity
         long total = 0;
         for (int i=0; (list!=null)&&( i<list.size()); i++)
             total = total + list.get(i).getDuration();
-        ((TextView)findViewById(R.id.txt_hours)).setText(DateConverter.GetElapsedTime(total));
+        ((TextView)findViewById(R.id.txt_hours)).setText(DateHandler.GetElapsedTime(total));
         if (list!=null && list.size()>0) {
             lst.setVisibility(View.VISIBLE);
             txt.setVisibility(View.GONE);
@@ -251,7 +244,7 @@ public class MainActivity extends ActionBarActivity
             long curr = System.currentTimeMillis();
             total_time += curr - elapsed_time;
             TextView txt = (TextView)findViewById(R.id.txt_time);
-            txt.setText(DateConverter.GetElapsedTime(total_time));
+            txt.setText(DateHandler.GetElapsedTime(total_time));
             elapsed_time = System.currentTimeMillis();
 /*
             if (notifier!=null && Preferences.getNotificationEnable(this))
@@ -270,7 +263,7 @@ public class MainActivity extends ActionBarActivity
     private void ticker () {
         this.runOnUiThread(tick);
     }
-
+/*
     public void onSectionAttached(int number) {
         switch (number) {
             case 1:
@@ -279,14 +272,12 @@ public class MainActivity extends ActionBarActivity
             case 2:
                 mTitle = getString(R.string.title_activities);
                 break;
-            /*
             case 3:
                 mTitle = getString(R.string.title_section3);
                 break;
-            */
         }
     }
-
+*/
     public void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
@@ -328,8 +319,7 @@ public class MainActivity extends ActionBarActivity
         }
         if (tmp != null) {
             if (actual_layout != null) {
-                previous_layout = actual_layout;
-                previous_layout.setVisibility(View.GONE);
+                actual_layout.setVisibility(View.GONE);
             }
             actual_layout = tmp;
             actual_layout.setVisibility(View.VISIBLE);
@@ -463,7 +453,7 @@ public class MainActivity extends ActionBarActivity
     @Override
     protected void onStop() {
         super.onStop();
-        if (internal_state==States.STATE_RUNNING || internal_state==States.STATE_RUNNING)
+        if (internal_state==States.STATE_RUNNING)
             JobStorage.setPendingJob(this, total_time, System.currentTimeMillis());
         else
             JobStorage.removePendingJob(this);
@@ -505,9 +495,9 @@ public class MainActivity extends ActionBarActivity
             if (txt==null)
                 return;
             if (selectedJobs==null)
-                selectedJobs = new ArrayList<Integer>();
+                selectedJobs = new ArrayList<>();
             if (selectedViews==null)
-                selectedViews = new ArrayList<View>();
+                selectedViews = new ArrayList<>();
             System.out.println("TOTAL SELECTED: "+selectedViews.size());
             selectedJobs.add(Integer.parseInt(txt.getText().toString()));
             selectedViews.add(v);
@@ -542,17 +532,17 @@ public class MainActivity extends ActionBarActivity
         synchronized public int getDeletedJobs () {
             return deletedCount;
         }
-
+/*
         synchronized public int getSelectedJobs () {
             if (selectedJobs!=null)
                 return selectedJobs.size();
             return 0;
         }
-
+*/
         private void deleteJobs () {
             deletedCount = 0;
             if (memento==null)
-                memento = new ArrayList<JobEntry>();
+                memento = new ArrayList<>();
             else
                 memento.clear();
             jobs.open();
@@ -592,11 +582,11 @@ public class MainActivity extends ActionBarActivity
             selectedJobs = null;
             mActionMode = null;
         }
-
+/*
         synchronized public void ignoreAction () {
             mActionMode.finish();
         }
-
+*/
         synchronized public boolean undo () {
             boolean ret = true;
             if (memento==null)
@@ -613,7 +603,7 @@ public class MainActivity extends ActionBarActivity
             memento = null;
             return ret;
         }
-    };
+    }
 
     private ActionMode.Callback actionModeCallback = new ActionMode.Callback() {
 
@@ -647,18 +637,16 @@ public class MainActivity extends ActionBarActivity
         }
     };
 
-    private AlertDialog dialogDeleteExam = null;
-
     private void deleteJobs () {
         mementoHandler.deleteSelectedJobs();
         jobs.close();
-        fillList(null, DateRetriever.GetActualDate());
+        fillList(null, DateHandler.GetActualDate());
         showUndo();
     }
 
     private void showUndo () {
         //findViewById(R.id.sample_content_fragment).setVisibility(View.GONE);
-        final View view = (View)findViewById(R.id.undobar);
+        final View view = findViewById(R.id.undobar);
         view.setVisibility(View.VISIBLE);
         view.setAlpha(1);
         TextView txt = (TextView)view.findViewById(R.id.txtSumDelete);
@@ -698,37 +686,34 @@ public class MainActivity extends ActionBarActivity
         if (first_date==null && second_date==null)
             return null;
 
-        String body = new String();
+        String body = null;
         long total = 0;
         JobEntries jobs = new JobEntries(this);
         jobs.open();
         List<JobEntry> list = jobs.getJobs(first_date, second_date);
         jobs.close();
         if (list==null || list.size()==0) {
-            body = new String("No activity stored");
+            body = "No activity stored";
         } else {
-            for (int i=0; (list!=null)&&( i<list.size()); i++) {
+            for (int i=0; i<list.size(); i++) {
                 JobEntry entry = list.get(i);
                 if (entry != null) {
-                    body = body + new String(DateConverter.GetPreferenceDateFormat(entry.getStop()) +
-                            ":  " + DateConverter.GetElapsedTime(entry.getDuration()) + "\n");
+                    body = DateHandler.GetPreferenceDateFormat(entry.getStop()) + ":  " + DateHandler.GetElapsedTime(entry.getDuration()) + "\n";
                     total += entry.getDuration();
-                }
+                } else
+                    body = "";
             }
         }
 
         String header;
         if (first_date==null) {
-            header = new String("All activities until " +
-                    DateConverter.GetPreferenceDateFormat(second_date) +
-                    " (total time "+DateConverter.GetElapsedTime(total) + "):\n");
+            header = "All activities until " + DateHandler.GetPreferenceDateFormat(second_date) + " (total time "+ DateHandler.GetElapsedTime(total) + "):\n";
         } else {
-            header = new String("All activities from " +
-                    DateConverter.GetPreferenceDateFormat(first_date) + " to "+
-                    DateConverter.GetPreferenceDateFormat(second_date) + " (total time " +
-                    DateConverter.GetElapsedTime(total)+"):\n");
+            header = "All activities from " + DateHandler.GetPreferenceDateFormat(first_date) + " to "+ DateHandler.GetPreferenceDateFormat(second_date) + " (total time " + DateHandler.GetElapsedTime(total)+"):\n";
         }
 
-        return new String(header+body);
+        if (body==null)
+            return header;
+        return header+body;
     }
 }

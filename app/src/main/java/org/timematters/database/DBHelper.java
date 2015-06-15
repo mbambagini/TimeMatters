@@ -4,10 +4,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import java.sql.Timestamp;
-
 /**
- * Created by mario on 02/02/15.
+ * Database handler
  */
 public class DBHelper extends SQLiteOpenHelper {
 
@@ -27,8 +25,10 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_DESCR = "_descr";
 
     //extra
+    /*
     public static final int DB_TRUE = 1;
     public static final int DB_FALSE = 0;
+    */
 
     //creation queries
     private static final String DATABASE_CREATE_JOBS = "create table "

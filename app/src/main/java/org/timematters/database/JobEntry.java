@@ -1,10 +1,9 @@
 package org.timematters.database;
 
 import java.sql.Date;
-import java.sql.Timestamp;
 
 /**
- * Created by mario on 02/02/15.
+ * Database tuple
  */
 public class JobEntry implements Comparable<JobEntry>  {
 
@@ -48,7 +47,7 @@ public class JobEntry implements Comparable<JobEntry>  {
         if (s==null)
             descr = null;
         else
-            descr = new String(s);
+            descr = s;
     }
 
     @Override

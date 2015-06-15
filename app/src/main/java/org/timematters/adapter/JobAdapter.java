@@ -8,12 +8,13 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import org.timematters.R;
 import org.timematters.database.JobEntry;
-import org.timematters.utils.DateConverter;
+import org.timematters.utils.DateHandler;
 
 import java.util.List;
 
 /**
  * Created by mario on 21/02/15.
+ * JobEntry adapter
  */
 public class JobAdapter extends ArrayAdapter<JobEntry> {
 
@@ -47,8 +48,8 @@ public class JobAdapter extends ArrayAdapter<JobEntry> {
             view.setTag(viewHolder);
         }
         ViewHolder holder = (ViewHolder) view.getTag();
-        holder.when.setText(DateConverter.GetPreferenceDateFormat(jobs.get(position).getStop()));
-        holder.time.setText(DateConverter.GetElapsedTime(jobs.get(position).getDuration()));
+        holder.when.setText(DateHandler.GetPreferenceDateFormat(jobs.get(position).getStop()));
+        holder.time.setText(DateHandler.GetElapsedTime(jobs.get(position).getDuration()));
         holder.note.setText(jobs.get(position).getDescr());
         holder.id.setText(Long.toString(jobs.get(position).getId()));
         return view;
