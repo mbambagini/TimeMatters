@@ -16,12 +16,18 @@ import org.timematters.utils.DateConverter;
 
 import java.util.Date;
 
+/*!
+ * this Activity shows the result of the actual tracking and lets the user
+ * insert additional information before permanently storing it
+ */
 public class SaveActivity extends ActionBarActivity {
 
-    private String external_date;
     private String internal_date;
     private long duration = 0;
 
+    /*!
+     * read input and show it
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,62 +38,39 @@ public class SaveActivity extends ActionBarActivity {
 
         Date actual_date = new Date();
         duration = getIntent().getExtras().getLong(getString(R.string.elapsed_time_id));
-        external_date = DateConverter.GetPreferenceDateFormat(actual_date);
         internal_date = DateConverter.GetSQLDateFormat(actual_date);
-        txt_when.setText(external_date);
+        txt_when.setText(DateConverter.GetPreferenceDateFormat(actual_date));
         txt_duration.setText(DateConverter.GetElapsedTime(duration));
     }
 
+    /*!
+     * store information
+     */
     public void onClickUpperButtons (View view) {
         JobEntry job;
         boolean created = true;
-        switch (view.getId()) {
-            case R.id.btn_save:
-                job = new JobEntry();
-                job.setDuration(duration);
-                job.setStop(internal_date);
-                job.setDescr(((TextView) findViewById(R.id.txt_summary_note)).getText().toString());
-                JobEntries handler = new JobEntries(getApplicationContext());
-                handler.open();
-                try {
-                    handler.addJob(job);
-                } catch (JobNotCreated e) {
-                    created = false;
-                }
-                if (created) {
-                    Toast.makeText(this, getString(R.string.tst_event_created), Toast.LENGTH_LONG).show();
-                    handler.close();
-                    finish();
-                } else {
-                    Toast.makeText(this, getString(R.string.tst_event_not_created), Toast.LENGTH_LONG).show();
-                    handler.close();
-                }
-                break;
+
+        if (view.getId()==R.id.btn_save) {
+            job = new JobEntry();
+            job.setDuration(duration);
+            job.setStop(internal_date);
+            job.setDescr(((TextView) findViewById(R.id.txt_summary_note)).getText().toString());
+            JobEntries handler = new JobEntries(getApplicationContext());
+            handler.open();
+            try {
+                handler.addJob(job);
+            } catch (JobNotCreated e) {
+                created = false;
+            }
+            if (created) {
+                Toast.makeText(this, getString(R.string.tst_event_created), Toast.LENGTH_LONG).show();
+                handler.close();
+                finish();
+            } else {
+                Toast.makeText(this, getString(R.string.tst_event_not_created), Toast.LENGTH_LONG).show();
+                handler.close();
+            }
         }
     }
-
-    /*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_save, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-*/
 
 }
