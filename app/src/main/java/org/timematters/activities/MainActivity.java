@@ -508,6 +508,7 @@ public class MainActivity extends ActionBarActivity
                 selectedJobs = new ArrayList<Integer>();
             if (selectedViews==null)
                 selectedViews = new ArrayList<View>();
+            System.out.println("TOTAL SELECTED: "+selectedViews.size());
             selectedJobs.add(Integer.parseInt(txt.getText().toString()));
             selectedViews.add(v);
             v.setSelected(true);
