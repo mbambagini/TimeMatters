@@ -32,6 +32,7 @@ public class DateHandler {
         return sdf.format(date);
     }
 
+    /*
     static public String GetTimeFormat (Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("hh:mm");
         return sdf.format(date);
@@ -41,6 +42,7 @@ public class DateHandler {
         DecimalFormat formatter = new DecimalFormat("00");
         return formatter.format(hour)+":"+formatter.format(minute);
     }
+    */
 
     static public Date GetMonthStart () {
         Calendar cal = Calendar.getInstance();

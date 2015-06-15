@@ -14,21 +14,19 @@ public class JobStorage {
     static private String FILENAME = "pendingJob";
 
     static public boolean setPendingJob (Context c, long duration, long actual_time) {
-        FileOutputStream fos = null;
-        DataOutputStream os = null;
+        FileOutputStream fos;
+        DataOutputStream os;
 
         try {
-            fos = c.openFileOutput(FILENAME, c.MODE_PRIVATE);
+            fos = c.openFileOutput(FILENAME, Context.MODE_PRIVATE);
             if (fos==null)
                 return false;
             os = new DataOutputStream(fos);
             os.writeLong(duration);
             os.writeLong(actual_time);
             System.out.println("WRITE: " + actual_time + " " + duration);
-            if (fos!=null)
-                fos.close();
-            if (os!=null)
-                os.close();
+            fos.close();
+            os.close();
         } catch (FileNotFoundException e) {
             return false;
         } catch (IOException e) {
@@ -43,8 +41,8 @@ public class JobStorage {
     }
 
     static public long getPendingJob (Context c, long actual_time, long def) {
-        FileInputStream fos = null;
-        DataInputStream is = null;
+        FileInputStream fos;
+        DataInputStream is;
         long stop_time;
         long duration;
 

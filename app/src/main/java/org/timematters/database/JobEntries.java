@@ -46,18 +46,16 @@ public class JobEntries {
     }
 
     public List<JobEntry> getJobs(Date start, Date stop) {
-        String orderByClause = new String (DBHelper.COLUMN_STOP+" DESC");
-        String whereClause = new String (DBHelper.COLUMN_STOP + "<= \'" +
-                                                       DateHandler.GetSQLDateFormat(stop) + "\'");
+        String orderByClause = DBHelper.COLUMN_STOP+" DESC";
+        String whereClause = DBHelper.COLUMN_STOP + "<= \'" + DateHandler.GetSQLDateFormat(stop) + "\'";
         if (start!=null)
-            whereClause += new String (" AND " + DBHelper.COLUMN_STOP + ">= \'" +
-                                                      DateHandler.GetSQLDateFormat(start) + "\'");
+            whereClause += " AND " + DBHelper.COLUMN_STOP + ">= \'" + DateHandler.GetSQLDateFormat(start) + "\'";
         Cursor cursor = db.query(DBHelper.TABLE_JOBS, allJobColumns, whereClause, null, null, null,
                                                                                      orderByClause);
         if (cursor.getCount()==0)
             return null;
         cursor.moveToFirst();
-        List<JobEntry> jobs = new ArrayList<JobEntry>();
+        List<JobEntry> jobs = new ArrayList<>();
         while (!cursor.isAfterLast()) {
             JobEntry job = cursorToJob(cursor);
             jobs.add(job);
@@ -69,14 +67,13 @@ public class JobEntries {
     }
 
     public JobEntry getJob (long id) throws JobNotFound {
-        String whereClause = new String (DBHelper.COLUMN_ID +"=" + id);
+        String whereClause = DBHelper.COLUMN_ID +"=" + id;
         Cursor cursor = db.query(DBHelper.TABLE_JOBS, allJobColumns,  whereClause,
                                                                             null, null, null, null);
         if (cursor.getCount()==0)
             return null;
         cursor.moveToFirst();
-        JobEntry job = cursorToJob(cursor);
-        return job;
+        return cursorToJob(cursor);
     }
 
     public void addJob (JobEntry job) throws JobNotCreated {
