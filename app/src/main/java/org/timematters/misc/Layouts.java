@@ -2,6 +2,7 @@ package org.timematters.misc;
 
 /**
  * Created by mario on 06/05/15.
+ * List of possible layouts
  */
 public enum Layouts {
     LAYOUT_TRACKING,
