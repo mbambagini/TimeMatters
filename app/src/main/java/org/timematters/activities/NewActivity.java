@@ -19,18 +19,25 @@ import org.timematters.utils.DateConverter;
 
 import java.util.Date;
 
+/*!
+ * This Activity lets the user insert manually an activity
+ */
 public class NewActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new);
+
         TimePicker timePicker = (TimePicker)findViewById(R.id.timePickerTotalTime);
-        timePicker.setIs24HourView(true);
-        timePicker.setCurrentHour(8);
-        timePicker.setCurrentMinute(0);
+        if (timePicker!=null) {
+            timePicker.setIs24HourView(true);
+            timePicker.setCurrentHour(8);
+            timePicker.setCurrentMinute(0);
+        }
         DatePicker datePicker = (DatePicker)findViewById(R.id.datePickerNewActivity);
-        datePicker.setMaxDate(System.currentTimeMillis());
+        if (dataPicker!=null)
+            datePicker.setMaxDate(System.currentTimeMillis());
     }
 
     @Override
@@ -47,20 +54,15 @@ public class NewActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_save_new) {
-            if (saveActivity())
-                finish();
-        }
+        if ((id==R.id.action_save_new) && saveActivity())
+            finish();
 
         return super.onOptionsItemSelected(item);
     }
 
     public void onClickUpperButtons(View v) {
-        if (v.getId() == R.id.btn_save_new) {
-            if (saveActivity())
+        if ((v.getId()==R.id.btn_save_new) && saveActivity())
                 finish();
-        }
     }
 
     public boolean saveActivity () {
