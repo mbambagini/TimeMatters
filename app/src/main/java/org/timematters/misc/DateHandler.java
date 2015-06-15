@@ -1,4 +1,4 @@
-package org.timematters.utils;
+package org.timematters.misc;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;

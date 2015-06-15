@@ -8,7 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import org.timematters.R;
 import org.timematters.database.JobEntry;
-import org.timematters.utils.DateHandler;
+import org.timematters.misc.DateHandler;
 
 import java.util.List;
 

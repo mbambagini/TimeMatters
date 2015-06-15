@@ -11,7 +11,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
-import org.timematters.utils.DateHandler;
+import org.timematters.misc.DateHandler;
 import org.timematters.exceptions.JobNotCreated;
 import org.timematters.exceptions.JobNotFound;
 

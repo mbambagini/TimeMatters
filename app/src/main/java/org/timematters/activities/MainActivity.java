@@ -28,8 +28,8 @@ import org.timematters.exceptions.JobNotCreated;
 import org.timematters.exceptions.JobNotFound;
 import org.timematters.misc.Layouts;
 import org.timematters.misc.States;
-import org.timematters.utils.DateHandler;
-import org.timematters.utils.JobStorage;
+import org.timematters.misc.DateHandler;
+import org.timematters.misc.JobStorage;
 
 import java.util.ArrayList;
 import java.util.Date;
