@@ -36,7 +36,7 @@ public class NewActivity extends ActionBarActivity {
             timePicker.setCurrentMinute(0);
         }
         DatePicker datePicker = (DatePicker)findViewById(R.id.datePickerNewActivity);
-        if (dataPicker!=null)
+        if (datePicker!=null)
             datePicker.setMaxDate(System.currentTimeMillis());
     }
 
