@@ -78,8 +78,6 @@ public class NewActivity extends ActionBarActivity {
         JobEntry job = new JobEntry();
         if (note.getText().toString()!=null)
             job.setDescr(note.getText().toString());
-        System.out.println("DATE: "+datePicker.getYear()+" "+datePicker.getMonth()+" "+datePicker.getDayOfMonth());
-        System.out.println("DURATION: "+duration);
         Date date = new Date();
         date.setYear(datePicker.getYear()-1900);
         date.setMonth(datePicker.getMonth());
@@ -88,7 +86,6 @@ public class NewActivity extends ActionBarActivity {
         date.setHours(0);
         job.setStop(DateHandler.GetSQLDateFormat(date));
         job.setDuration(duration);
-        System.out.println(date.getTime());
         try {
             db.addJob(job);
         } catch (JobNotCreated jobNotCreated) {
