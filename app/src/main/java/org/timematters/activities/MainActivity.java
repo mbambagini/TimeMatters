@@ -37,7 +37,11 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-
+/**
+ * This Activity implements the main features of the app: tracking,
+ * listing and search.
+ * A navigation drawer lets the user navigate through the facilities
+ */
 public class MainActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     /**
@@ -50,12 +54,21 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
      */
     private CharSequence mTitle;
 
+    /**
+     * Used to store the actual layout to be shown
+     */
     private Layouts internal_layout = Layouts.LAYOUT_TRACKING;
 
-    private States  internal_state = States.STATE_IDLE;
-
+    /**
+     * Reference to the actual frame layout: used when a new one is selected to
+     * disable the previous
+     */
     private FrameLayout actual_layout = null;
-
+    
+    /**
+     * Current state of the tracking feature
+     */
+    private States  internal_state = States.STATE_IDLE;
 
     private Date first_date = null;
     private Date second_date = null;
@@ -65,14 +78,13 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mNavigationDrawerFragment = (NavigationDrawerFragment)
-                getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
+        mNavigationDrawerFragment = (NavigationDrawerFragment)getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
 
+        //check if the tracking must be resumed after the application/activity is closed/suspended
         if (savedInstanceState == null) {
             long val = JobStorage.getPendingJob(this, System.currentTimeMillis(), -1);
-            if (val!=-1) { // && Preferences.getResumeJob(this)) {
-                //ask if the user wants to resume the previous session
+            if (val!=-1) {
                 internal_state = States.STATE_RUNNING;
                 internal_layout = Layouts.LAYOUT_TRACKING;
                 start_counter(val);
@@ -82,9 +94,9 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         }
 
         // Set up the drawer.
-        mNavigationDrawerFragment.setUp(
-                R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
+        mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
 
+        //setup memento
         jobs = new JobEntries(getApplicationContext());
         mementoHandler = new Memento();
         ListView lst = (ListView)findViewById(R.id.lstJobs);
@@ -103,6 +115,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             }
         });
 
+        //show layout
         setLayout();
     }
 
@@ -111,64 +124,152 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         // update the main content by replacing fragments
         System.out.println(position);
         switch (position) {
-            case 0:
+            case 0: //home - tracking
                 internal_layout = Layouts.LAYOUT_TRACKING;
                 break;
-            case 1:
+            case 1: //complete list
                 internal_layout = Layouts.LAYOUT_LIST;
                 first_date = null;
                 second_date = DateHandler.GetActualDate();
                 fillList(first_date, second_date);
                 break;
-            case 2:
+            case 2: //this week list
                 internal_layout = Layouts.LAYOUT_LIST;
                 first_date = DateHandler.GetLastSunday();
                 second_date = DateHandler.GetActualDate();
                 fillList(first_date, second_date);
                 break;
-            case 3:
+            case 3: //this month list
                 internal_layout = Layouts.LAYOUT_LIST;
                 first_date = DateHandler.GetMonthStart();
                 second_date = DateHandler.GetActualDate();
                 fillList(first_date, second_date);
                 break;
-            case 4:
+            case 4: //search
                 internal_layout = Layouts.LAYOUT_SEARCH;
                 break;
-            case 5:
+            case 5: //about
                 internal_layout = Layouts.LAYOUT_ABOUT;
                 break;
         }
         setLayout();
     }
 
+    public void restoreActionBar() {
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setTitle(mTitle);
+    }
+
+    /**
+     * Inflate the correct menu according to the actual layout and only iff
+     * the drawer is closed
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (!mNavigationDrawerFragment.isDrawerOpen()) {
+            switch (internal_layout) {
+                case LAYOUT_LIST:
+                    getMenuInflater().inflate(R.menu.main, menu);
+                    break;
+                case LAYOUT_SEARCH:
+                case LAYOUT_TRACKING:
+                case LAYOUT_ABOUT:
+                default:
+                    getMenuInflater().inflate(R.menu.main_reduced, menu);
+                    break;
+            }
+            restoreActionBar();
+            return true;
+        }
+        return super.onCreateOptionsMenu(menu);
+    }
+    
+    /**
+     * Since this Activity may be resumed after a new element has been
+     * inserted, the list must be updated (if the layout was LAYOUT_LIST)
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        setLayout();
+        if (internal_layout == Layouts.LAYOUT_LIST)
+            fillList(first_date, second_date);
+    }
+
+    /**
+     * Callback invoked when an item in the menu is selected
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch(id) {
+            case R.id.action_share:
+                String msg = buildString();
+                if (msg!=null) {
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, buildString());
+                    sendIntent.setType("text/plain");
+                    startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.action_share)));
+                } else {
+                    Toast.makeText(this, getString(R.string.tst_no_share), Toast.LENGTH_LONG).show();
+                }
+                break;
+            case R.id.action_new:
+            case R.id.action_new_reduced:
+                Intent intent = new Intent(this, NewActivity.class);
+                startActivity(intent);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+   }
+
+    /**
+     * When the Activity is stopped,  if a tracking was running, its state will be
+     * saved to be resumed
+     */
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (internal_state==States.STATE_RUNNING)
+            JobStorage.setPendingJob(this, total_time, System.currentTimeMillis());
+        else
+            JobStorage.removePendingJob(this);
+    }
+
+    /**
+     * This function is called when a button is pressed
+     */
     public void onClickUpperButtons(View v) {
         switch (v.getId()) {
-            case R.id.btn_tap_to_start:
+            case R.id.btn_tap_to_start: //start the tracking
                 internal_state = States.STATE_RUNNING;
                 internal_layout = Layouts.LAYOUT_TRACKING;
                 start_counter(0L);
                 setLayout();
                 break;
-            case R.id.btn_stop:
+            case R.id.btn_stop: //stop the tracking
                 internal_state = States.STATE_IDLE;
                 internal_layout = Layouts.LAYOUT_TRACKING;
                 Intent intent = new Intent(this, SaveActivity.class);
                 intent.putExtra(getString(R.string.elapsed_time_id), total_time);
                 startActivity(intent);
                 break;
-            case R.id.btn_pause:
+            case R.id.btn_pause: //pause the tracking
                 internal_state = States.STATE_BLOCKED;
                 internal_layout = Layouts.LAYOUT_TRACKING;
                 setLayout();
                 break;
-            case R.id.btn_tap_to_resume:
+            case R.id.btn_tap_to_resume: //resume the tracking
                 internal_state = States.STATE_RUNNING;
                 internal_layout = Layouts.LAYOUT_TRACKING;
                 elapsed_time = System.currentTimeMillis();
                 setLayout();
                 break;
-            case R.id.btn_search:
+            case R.id.btn_search: //start a search
                 DatePicker datePickerFrom = (DatePicker)findViewById(R.id.datePickerSearchFrom);
                 DatePicker datePickerTo = (DatePicker)findViewById(R.id.datePickerSearchUntil);
                 if ((datePickerFrom != null) && (datePickerTo != null)) {
@@ -195,6 +296,8 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                 break;
         }
     }
+
+/* UNTIL HERE */
 
     /* show list */
     private void fillList (Date start, Date stop) {
@@ -262,7 +365,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     private void ticker () {
         this.runOnUiThread(tick);
     }
-/*
+
     public void onSectionAttached(int number) {
         switch (number) {
             case 1:
@@ -275,13 +378,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                 mTitle = getString(R.string.title_section3);
                 break;
         }
-    }
-*/
-    public void restoreActionBar() {
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle(mTitle);
     }
 
     private void setLayout () {
@@ -324,78 +420,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             actual_layout.setVisibility(View.VISIBLE);
         }
         /* to be optimized: do not change the layout when it is the same */
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mNavigationDrawerFragment.isDrawerOpen()) {
-            // Only show items in the action bar relevant to this screen
-            // if the drawer is not showing. Otherwise, let the drawer
-            // decide what to show in the action bar.
-            switch (internal_layout) {
-                case LAYOUT_LIST:
-                    getMenuInflater().inflate(R.menu.main, menu);
-                    break;
-                case LAYOUT_SEARCH:
-                case LAYOUT_TRACKING:
-                case LAYOUT_ABOUT:
-                default:
-                    getMenuInflater().inflate(R.menu.main_reduced, menu);
-                    break;
-            }
-            restoreActionBar();
-            return true;
-        }
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        setLayout();
-        if (internal_layout == Layouts.LAYOUT_LIST)
-            fillList(first_date, second_date);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        switch(id) {
-            case R.id.action_share:
-                String msg = buildString();
-                if (msg!=null) {
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, buildString());
-                    sendIntent.setType("text/plain");
-                    startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.action_share)));
-                } else {
-                    Toast.makeText(this, getString(R.string.tst_no_share), Toast.LENGTH_LONG).show();
-                }
-                break;
-            case R.id.action_new:
-            case R.id.action_new_reduced:
-                Intent intent = new Intent(this, NewActivity.class);
-                //intent.putExtra(getString(R.string.elapsed_time_id), total_time);
-                startActivity(intent);
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
-   }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (internal_state==States.STATE_RUNNING)
-            JobStorage.setPendingJob(this, total_time, System.currentTimeMillis());
-        else
-            JobStorage.removePendingJob(this);
     }
 
     private Memento mementoHandler;
