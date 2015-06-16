@@ -366,6 +366,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         this.runOnUiThread(tick);
     }
 
+    /*
     public void onSectionAttached(int number) {
         switch (number) {
             case 1:
@@ -379,6 +380,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                 break;
         }
     }
+    */
 
     private void setLayout () {
         FrameLayout tmp = null;

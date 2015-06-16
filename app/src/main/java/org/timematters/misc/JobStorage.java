@@ -20,7 +20,7 @@ public class JobStorage {
     /**
      * File to be used
      */
-    private final String FILENAME = "pendingJob";
+    static private final String FILENAME = "pendingJob";
 
     /**
      * Save the information permanently
