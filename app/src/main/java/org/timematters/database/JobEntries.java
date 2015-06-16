@@ -39,19 +39,25 @@ public class JobEntries {
         dbHelper.close();
     }
 
+    /**
+     * Delete the job passed as argument
+     */
     public void deleteJob (JobEntry job) throws JobNotFound {
         int i = db.delete(DBHelper.TABLE_JOBS, DBHelper.COLUMN_ID + " = " + job.getId() + "", null);
         if (i!=1)
             throw new JobNotFound();
     }
 
+    /**
+     * Returns all activities whose date (stop field) is between the two
+     * arguments
+     */
     public List<JobEntry> getJobs(Date start, Date stop) {
         String orderByClause = DBHelper.COLUMN_STOP+" DESC";
         String whereClause = DBHelper.COLUMN_STOP + "<= \'" + DateHandler.GetSQLDateFormat(stop) + "\'";
         if (start!=null)
             whereClause += " AND " + DBHelper.COLUMN_STOP + ">= \'" + DateHandler.GetSQLDateFormat(start) + "\'";
-        Cursor cursor = db.query(DBHelper.TABLE_JOBS, allJobColumns, whereClause, null, null, null,
-                                                                                     orderByClause);
+        Cursor cursor = db.query(DBHelper.TABLE_JOBS, allJobColumns, whereClause, null, null, null, orderByClause);
         if (cursor.getCount()==0)
             return null;
         cursor.moveToFirst();
@@ -66,19 +72,23 @@ public class JobEntries {
         return jobs;
     }
 
+    /**
+     * Return a job with the specified ID
+     */
     public JobEntry getJob (long id) throws JobNotFound {
         String whereClause = DBHelper.COLUMN_ID +"=" + id;
-        Cursor cursor = db.query(DBHelper.TABLE_JOBS, allJobColumns,  whereClause,
-                                                                            null, null, null, null);
+        Cursor cursor = db.query(DBHelper.TABLE_JOBS, allJobColumns,  whereClause, null, null, null, null);
         if (cursor.getCount()==0)
             return null;
         cursor.moveToFirst();
         return cursorToJob(cursor);
     }
 
+    /**
+     * Add the passed activity
+     */
     public void addJob (JobEntry job) throws JobNotCreated {
         ContentValues values = new ContentValues();
-//        values.put(DBHelper.COLUMN_ID, job.getId());
         values.put(DBHelper.COLUMN_STOP, job.getStop().toString());
         values.put(DBHelper.COLUMN_DURATION, job.getDuration());
         values.put(DBHelper.COLUMN_DESCR, job.getDescr());
@@ -90,6 +100,12 @@ public class JobEntries {
         }
     }
 
+    /**
+     * Restore an activity
+     * The difference with respect to addJob is that the latter does not 
+     * set the ID field which is automatically incremented.
+     * On the other hand, this function restores the previous ID
+     */
     public void restoreJob (JobEntry job) throws JobNotCreated {
         ContentValues values = new ContentValues();
         values.put(DBHelper.COLUMN_ID, job.getId());
@@ -103,6 +119,9 @@ public class JobEntries {
         }
     }
 
+    /**
+     * Convert a database cursor into an activity
+     */
     private JobEntry cursorToJob (Cursor cursor) {
         JobEntry job = new JobEntry ();
 
