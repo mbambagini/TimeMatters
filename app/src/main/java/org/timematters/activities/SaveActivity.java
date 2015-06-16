@@ -16,7 +16,7 @@ import java.util.Date;
 
 /*!
  * this Activity shows the result of the actual tracking and lets the user
- * insert additional information before permanently storing it
+ * insert additional information before storing it permanently
  */
 public class SaveActivity extends ActionBarActivity {
 
@@ -24,7 +24,7 @@ public class SaveActivity extends ActionBarActivity {
     private long duration = 0;
 
     /*!
-     * read input and show it
+     * Read inputs and show them
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +42,7 @@ public class SaveActivity extends ActionBarActivity {
     }
 
     /*!
-     * store information
+     * Store information
      */
     public void onClickUpperButtons (View view) {
         JobEntry job;
