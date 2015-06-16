@@ -9,10 +9,22 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+/**
+ * This class provides facilities to save permanently information.
+ * This is used to restore a tracking when the application is put
+ * in the background or even closed.
+ * The implementation relies on a local file
+ */
 public class JobStorage {
 
-    static private String FILENAME = "pendingJob";
+    /**
+     * File to be used
+     */
+    private final String FILENAME = "pendingJob";
 
+    /**
+     * Save the information permanently
+     */
     static public boolean setPendingJob (Context c, long duration, long actual_time) {
         FileOutputStream fos;
         DataOutputStream os;
@@ -24,7 +36,6 @@ public class JobStorage {
             os = new DataOutputStream(fos);
             os.writeLong(duration);
             os.writeLong(actual_time);
-            System.out.println("WRITE: " + actual_time + " " + duration);
             fos.close();
             os.close();
         } catch (FileNotFoundException e) {
@@ -35,11 +46,16 @@ public class JobStorage {
         return true;
     }
 
+    /**
+     * Delete the stored information
+     */
     static public void removePendingJob(Context c) {
-        System.out.println("DELETE: ");
         c.deleteFile(FILENAME);
     }
 
+    /**
+     * Retrieve the stored information
+     */
     static public long getPendingJob (Context c, long actual_time, long def) {
         FileInputStream fos;
         DataInputStream is;
