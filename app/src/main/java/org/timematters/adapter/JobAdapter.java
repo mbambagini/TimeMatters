@@ -13,7 +13,6 @@ import org.timematters.misc.DateHandler;
 import java.util.List;
 
 /**
- * Created by mario on 21/02/15.
  * JobEntry adapter
  */
 public class JobAdapter extends ArrayAdapter<JobEntry> {
