@@ -5,8 +5,15 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+/**
+ *  This class provides a set of functions related to the 
+ *  management of date
+ */
 public class DateHandler {
 
+    /**
+     * Convert a duration in milliseconds into a string
+     */
     static public String GetElapsedTime (long duration) {
         DecimalFormat formatter = new DecimalFormat("00");
         DecimalFormat formatterHours = new DecimalFormat("0000");
@@ -22,11 +29,18 @@ public class DateHandler {
         return formatter.format(hours)+":" +formatter.format(minutes) + ":" + formatter.format(seconds);
     }
 
+    /**
+     * Convert a date into a string which can be stored within the
+     * internal database
+     */
     static public String GetSQLDateFormat (Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         return sdf.format(date);
     }
 
+    /**
+     * Convert a date into a string according to the pre-defined format
+     */
     static public String GetPreferenceDateFormat (Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("E dd/MM/yyyy");
         return sdf.format(date);
@@ -44,16 +58,25 @@ public class DateHandler {
     }
     */
 
+    /**
+     * Return the first day of the actual month
+     */
     static public Date GetMonthStart () {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.DAY_OF_MONTH, 1);
         return cal.getTime();
     }
 
+    /**
+     * Return the actual date
+     */
     static public Date GetActualDate () {
         return new Date();
     }
 
+    /**
+     * Return the date of the last sunday
+     */
     static public Date GetLastSunday () {
         Calendar cal = Calendar.getInstance();
         int day = cal.get(Calendar.DAY_OF_WEEK);
