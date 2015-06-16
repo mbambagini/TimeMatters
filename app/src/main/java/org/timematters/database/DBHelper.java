@@ -6,6 +6,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 /**
  * Database handler
+ * The database contains only a table called "Jobs" whose columns are
+ * _id: auto-incremental variable used as primary key
+ * _stop: the day the activity is computed
+ * _duration: elapsed time associated to the activity
+ * _descr: notes typed by the user
  */
 public class DBHelper extends SQLiteOpenHelper {
 
@@ -23,12 +28,6 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_STOP = "_stop";
     public static final String COLUMN_DURATION = "_duration";
     public static final String COLUMN_DESCR = "_descr";
-
-    //extra
-    /*
-    public static final int DB_TRUE = 1;
-    public static final int DB_FALSE = 0;
-    */
 
     //creation queries
     private static final String DATABASE_CREATE_JOBS = "create table "
