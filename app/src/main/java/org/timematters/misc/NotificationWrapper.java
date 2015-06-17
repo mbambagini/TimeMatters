@@ -14,14 +14,20 @@ import org.timematters.misc.DateHandler;
  */
 public class NotificationWrapper {
 
+    /**
+     * Notification identifier
+     */
     private int mid = 999;
 
     private NotificationManager mNotificationManager = null;
     private NotificationCompat.Builder mBuilder;
 
+    /**
+     * Create and show a notification
+     */
     public void create (Context c) {
-        Intent intent = new Intent(c, SaveActivity.class);
-        PendingIntent pIntent = PendingIntent.getActivity(c, 0, intent, 0);
+        //Intent intent = new Intent(c, SaveActivity.class);
+        //PendingIntent pIntent = PendingIntent.getActivity(c, 0, intent, 0);
 
         mBuilder = new NotificationCompat.Builder(c)
                 .setAutoCancel(true)
@@ -29,30 +35,34 @@ public class NotificationWrapper {
                 .setContentTitle(c.getResources().getString(R.string.notification_title))
                 .setContentText(c.getResources().getString(R.string.text_elapsed_time));
 
-        Intent resultIntent = new Intent(c, BaseActivity.class);
+        Intent resultIntent = new Intent(c, MainActivity.class);
         resultIntent.putExtra(c.getString(R.string.notification_intent), Long.valueOf(0));
-        resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(c, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-
         mBuilder.setContentIntent(resultPendingIntent);
-        mNotificationManager =
-                (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager = (NotificationManager)c.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(mid, mBuilder.build());
     }
 
+    /**
+     * Destroy the notification object, removing it from the notification area
+     */
     public void destroy (Context c) {
         if (mNotificationManager == null)
-            mNotificationManager = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager = (NotificationManager)c.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel(mid);
         mNotificationManager = null;
     }
 
+    /**
+     * Update the content of the notification by writing the actual elapsed time
+     */
     public void update (Context c, long duration) {
         if (mNotificationManager==null || mBuilder==null)
             return;
 
-        Intent resultIntent = new Intent(c, BaseActivity.class);
+        Intent resultIntent = new Intent(c, MainActivity.class);
         resultIntent.putExtra(c.getString(R.string.notification_intent), Long.valueOf(duration));
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(c, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
