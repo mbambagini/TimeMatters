@@ -5,8 +5,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
-import org.timematters.*;
-import org.timematters.misc.DateHandler;
+
+import org.timematters.R;
+import org.timematters.activities.MainActivity;
 
 /**
  * This class manages the notification bar when a tracking is running
@@ -36,7 +37,6 @@ public class NotificationWrapper {
                 .setContentText(c.getResources().getString(R.string.text_elapsed_time));
 
         Intent resultIntent = new Intent(c, MainActivity.class);
-        resultIntent.putExtra(c.getString(R.string.notification_intent), Long.valueOf(0));
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(c, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -63,11 +63,11 @@ public class NotificationWrapper {
             return;
 
         Intent resultIntent = new Intent(c, MainActivity.class);
-        resultIntent.putExtra(c.getString(R.string.notification_intent), Long.valueOf(duration));
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(c, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(resultPendingIntent);
-        mBuilder.setContentText(c.getResources().getString(R.string.text_elapsed_time)+" "+ DateConverter.GetElapsedTime(duration));
+        mBuilder.setContentText(c.getResources().getString(R.string.text_elapsed_time)+" "+ DateHandler.GetElapsedTime(duration));
         mNotificationManager.notify(mid, mBuilder.build());
     }
+
 }

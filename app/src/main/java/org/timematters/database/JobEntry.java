@@ -1,5 +1,7 @@
 package org.timematters.database;
 
+import android.support.annotation.Nullable;
+
 import java.sql.Date;
 
 /**
@@ -51,8 +53,10 @@ public class JobEntry implements Comparable<JobEntry>  {
     }
 
     @Override
-    public int compareTo(JobEntry another) {
-        return 0;
+    public int compareTo(@Nullable JobEntry another) {
+        if (another==null)
+            return 0;
+        return stop.compareTo(another.stop);
     }
 
     @Override

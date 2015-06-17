@@ -18,14 +18,9 @@
     <string name="navigation_drawer_close">Menu chiuso</string>
 
     <!-- action menu -->
-    <string name="action_share">Condividi...</string>
+    <string name="action_share">Condividi&#8230;</string>
     <string name="action_save">Salva</string>
-    <string name="action_new">Aggiungi attivit\&#x00E0;</string>
-<!--
-    <string name="action_settings">Settings</string>
-    <string name="action_export">Export as XML</string>
-    <string name="action_import">Import XML</string>
--->
+    <string name="action_new">Aggiungi attivit&#x00E0;</string>
 
     <!-- Simple words -->
     <string name="text_from">Da</string>
@@ -58,12 +53,9 @@
     <string name="text_total_hours">Tempo totale lavorato</string>
     <string name="text_empty">Nessuna attivit&#x00E0; salvata</string>
 
-    <!-- Intent's info exchanged -->
-    <string name="elapsed_time_id">elapsed_time_id</string>
-
     <!-- hints -->
-    <string name="hint_note">Scrivi qui le tue note...</string>
-    <string name="text_filename">Nome del file...</string>
+    <string name="hint_note">Scrivi qui le tue note&#8230;</string>
+    <string name="text_filename">Nome del file&#8230;</string>
 
     <!-- Toast messages -->
     <string name="msg_error_saving">Impossibile salvare l\'attivit&#x00E0;</string>
@@ -72,13 +64,9 @@
     <string name="tst_event_not_created">Elemento non salvato</string>
     <string name="tst_job_resumed">Attivit&#x00E0; ripresa</string>
     <string name="tst_no_share">Impossibile condividere le attivit&#x00E0;</string>
-<!--
-    <string name="tst_export_ok">Activities saved successfully</string>
-    <string name="tst_export_no">Impossible to save the file</string>
-    <string name="tst_export_already">The file already exists</string>
-    <string name="tst_export_empty">No activity to save</string>
-    <string name="tst_export_unmount">Media not mounted</string>
--->
     <string name="msg_undo_not_possible">Impossibile ripristinare le attivit&#x00E0;</string>
+
+    <!-- Notification -->
+    <string name="notification_title">TimeMatters - attivit&#x00E0; avviata</string>
 
 </resources>

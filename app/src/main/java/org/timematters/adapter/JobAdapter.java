@@ -10,6 +10,7 @@ import org.timematters.R;
 import org.timematters.database.JobEntry;
 import org.timematters.misc.DateHandler;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,6 +20,8 @@ public class JobAdapter extends ArrayAdapter<JobEntry> {
 
     private final Activity context;
     private final List<JobEntry> jobs;
+
+    private final ArrayList<Boolean> selections = new ArrayList<>();
 
     public JobAdapter(Activity context, int textViewResourceId, List<JobEntry> values) {
         super(context, textViewResourceId, values);
@@ -51,6 +54,8 @@ public class JobAdapter extends ArrayAdapter<JobEntry> {
         holder.time.setText(DateHandler.GetElapsedTime(jobs.get(position).getDuration()));
         holder.note.setText(jobs.get(position).getDescr());
         holder.id.setText(Long.toString(jobs.get(position).getId()));
+        view.setSelected(true);
+        view.refreshDrawableState();
         return view;
     }
 

@@ -18,7 +18,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <!-- action menu -->
-    <string name="action_share">Share...</string>
+    <string name="action_share">Share&#8230;</string>
     <string name="action_save">Save</string>
     <string name="action_new">Add activity</string>
     <string name="action_settings">Settings</string>
@@ -62,8 +62,8 @@
     <string name="elapsed_time_id">elapsed_time_id</string>
 
     <!-- hints -->
-    <string name="hint_note">Type your note here...</string>
-    <string name="text_filename">Filename...</string>
+    <string name="hint_note">Type your note here&#8230;</string>
+    <string name="text_filename">Filename&#8230;</string>
 
     <!-- Toast messages -->
     <string name="msg_error_saving">Impossible to save the activity</string>
@@ -80,5 +80,8 @@
     <string name="tst_export_unmount">Media not mounted</string>
 -->
     <string name="msg_undo_not_possible">Error while restoring activities</string>
+
+    <!-- Notification -->
+    <string name="notification_title">TimeMatters - activity started</string>
 
 </resources>

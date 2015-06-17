@@ -27,6 +27,7 @@ import org.timematters.database.JobEntry;
 import org.timematters.exceptions.JobNotCreated;
 import org.timematters.exceptions.JobNotFound;
 import org.timematters.misc.Layouts;
+import org.timematters.misc.NotificationWrapper;
 import org.timematters.misc.States;
 import org.timematters.misc.DateHandler;
 import org.timematters.misc.JobStorage;
@@ -72,6 +73,8 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
     private Date first_date = null;
     private Date second_date = null;
+
+    private NotificationWrapper notifier = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,7 +125,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
-        System.out.println(position);
         switch (position) {
             case 0: //home - tracking
                 internal_layout = Layouts.LAYOUT_TRACKING;
@@ -185,7 +187,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         }
         return super.onCreateOptionsMenu(menu);
     }
-    
+
     /**
      * Since this Activity may be resumed after a new element has been
      * inserted, the list must be updated (if the layout was LAYOUT_LIST)
@@ -196,6 +198,10 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         setLayout();
         if (internal_layout == Layouts.LAYOUT_LIST)
             fillList(first_date, second_date);
+        if (notifier!=null) {
+            notifier.destroy(this);
+            notifier = null;
+        }
     }
 
     /**
@@ -234,10 +240,13 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     @Override
     protected void onStop() {
         super.onStop();
-        if (internal_state==States.STATE_RUNNING)
+        if (internal_state==States.STATE_RUNNING) {
             JobStorage.setPendingJob(this, total_time, System.currentTimeMillis());
-        else
+            notifier = new NotificationWrapper();
+            notifier.create(this);
+        } else {
             JobStorage.removePendingJob(this);
+        }
     }
 
     /**
@@ -327,7 +336,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
     private long total_time = 0;
     private long elapsed_time = 0;
-    private final long period_1s = 1000;
+    static private final long period_1s = 1000;
     private Timer timer = new Timer();
 
     private void start_counter (long offset) {
@@ -348,10 +357,8 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             TextView txt = (TextView)findViewById(R.id.txt_time);
             txt.setText(DateHandler.GetElapsedTime(total_time));
             elapsed_time = System.currentTimeMillis();
-/*
-            if (notifier!=null && Preferences.getNotificationEnable(this))
+            if (notifier!=null)
                 notifier.update(this, total_time);
-*/
         }
     }
 
@@ -463,7 +470,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                 selectedJobs = new ArrayList<>();
             if (selectedViews==null)
                 selectedViews = new ArrayList<>();
-            System.out.println("TOTAL SELECTED: "+selectedViews.size());
             selectedJobs.add(Integer.parseInt(txt.getText().toString()));
             selectedViews.add(v);
             v.setSelected(true);
@@ -518,6 +524,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                     jobs.deleteJob(j);
                     deletedCount++;
                 } catch (JobNotFound e) {
+                    //skip
                 }
             }
             jobs.close();
