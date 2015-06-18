@@ -45,23 +45,28 @@ import java.util.TimerTask;
 public class MainActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     static private final long period_1s = 1000;
+
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
+
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
+
     /**
      * Used to store the actual layout to be shown
      */
     private Layouts internal_layout = Layouts.LAYOUT_TRACKING;
+
     /**
      * Reference to the actual frame layout: used when a new one is selected to
      * disable the previous
      */
     private FrameLayout actual_layout = null;
+
     /**
      * Current state of the tracking feature
      */
@@ -72,6 +77,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     private long total_time = 0;
     private long elapsed_time = 0;
     private Timer timer = new Timer();
+
     private Runnable tick = new Runnable() {
         @Override
         public void run() {
@@ -112,8 +118,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         }
     };
 
-/* UNTIL HERE */
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -144,14 +148,21 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         lst.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View view, int arg2, long arg3) {
-                if (mementoHandler.isSelectionMode())
-                    mementoHandler.toggleJob(view);
+                if (mementoHandler.isSelectionMode()) {
+                    TextView txt = (TextView)view.findViewById(R.id.txt_job_id);
+                    System.out.println("SELECTED: "+Long.parseLong(txt.getText().toString()));
+                    if (txt!=null)
+                        mementoHandler.toggleJob(view, Long.parseLong(txt.getText().toString()));
+                }
             }
         });
         lst.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                mementoHandler.toggleJob(view);
+                TextView txt = (TextView)view.findViewById(R.id.txt_job_id);
+                System.out.println("SELECTED: "+Long.parseLong(txt.getText().toString()));
+                if (txt!=null)
+                    mementoHandler.toggleJob(view, Long.parseLong(txt.getText().toString()));
                 return true;
             }
         });
@@ -344,6 +355,8 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         }
     }
 
+    private JobAdapter adapter = null;
+
     /* show list */
     private void fillList(Date start, Date stop) {
         JobEntries jobs = new JobEntries(this);
@@ -361,7 +374,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             lst.setVisibility(View.VISIBLE);
             txt.setVisibility(View.GONE);
             details.setVisibility(View.VISIBLE);
-            JobAdapter adapter = new JobAdapter(this, android.R.layout.simple_list_item_1, list);
+            adapter = new JobAdapter(this, android.R.layout.simple_list_item_1, list);
             lst.setAdapter(adapter);
         } else {
             lst.setVisibility(View.GONE);
@@ -538,8 +551,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     private class Memento {
         private ActionMode mActionMode = null;
 
-        private ArrayList<View> selectedViews = null;
-        private ArrayList<Integer> selectedJobs = null;
+        private ArrayList<Long> selectedJobs = null;
 
         private ArrayList<JobEntry> memento = null;
         private int deletedCount = 0;
@@ -548,55 +560,42 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             return mActionMode != null;
         }
 
-        synchronized public void toggleJob(View v) {
+        synchronized public void toggleJob(View v, Long id) {
             if (memento != null)
                 return;
             if (mActionMode == null) {
                 mActionMode = MainActivity.this.startActionMode(actionModeCallback);
                 selectedJobs = null;
-                selectedViews = null;
             }
-            if (selectedViews != null && selectedViews.indexOf(v) != -1)
-                deselectJob(v);
+            if (selectedJobs!=null && selectedJobs.contains(id))
+                deselectJob(v, id);
             else
-                selectJob(v);
-            if (selectedViews != null)
-                mActionMode.setTitle(Integer.toString(selectedViews.size()));
+                selectJob(v, id);
+            if (selectedJobs != null)
+                mActionMode.setTitle(Integer.toString(selectedJobs.size()));
         }
 
-        synchronized private void selectJob(View v) {
-            TextView txt = (TextView) v.findViewById(R.id.txt_job_id);
-            if (txt == null)
-                return;
+        synchronized private void selectJob(View v, Long id) {
             if (selectedJobs == null)
                 selectedJobs = new ArrayList<>();
-            if (selectedViews == null)
-                selectedViews = new ArrayList<>();
-            selectedJobs.add(Integer.parseInt(txt.getText().toString()));
-            selectedViews.add(v);
+            if (selectedJobs.contains(id)==false)
+                selectedJobs.add(id);
+            if (adapter!=null)
+                adapter.setSelection(id, true);
             v.setSelected(true);
             v.setBackgroundColor(getResources().getColor(R.color.selected_job));
+            System.out.println("SELEZIONATO "+id);
         }
 
-        synchronized private void deselectJob(View v) {
-            TextView txt = (TextView) v.findViewById(R.id.txt_job_id);
-            if (txt == null) {
-                mActionMode.finish();
-                return;
-            }
-            if (selectedJobs != null) {
-                Integer val = Integer.parseInt(txt.getText().toString());
-                for (int i = 0; i < selectedJobs.size(); i++)
-                    if (selectedJobs.get(i).compareTo(val) == 0) {
-                        selectedJobs.remove(i);
-                        break;
-                    }
-            }
-            if (selectedViews != null)
-                selectedViews.remove(v);
+        synchronized private void deselectJob(View v, Long id) {
+            System.out.println("DE-SELEZIONATO "+id);
+            if (selectedJobs != null)
+                selectedJobs.remove(id);
             v.setBackgroundColor(Color.TRANSPARENT);
             v.setSelected(false);
-            if (selectedJobs != null && selectedJobs.size() == 0)
+            if (adapter!=null)
+                adapter.setSelection(id, false);
+            if (selectedJobs == null || selectedJobs.size() == 0)
                 mActionMode.finish();
         }
 
@@ -618,7 +617,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             else
                 memento.clear();
             jobs.open();
-            for (Integer i : selectedJobs) {
+            for (Long i : selectedJobs) {
                 try {
                     JobEntry j = jobs.getJob(i);
                     memento.add(j);
@@ -644,14 +643,14 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         }
 
         synchronized public void destroyMode() {
-            if (selectedViews != null)
+/*            if (selectedViews != null)
                 for (View v : selectedViews) {
                     if (v != null) {
                         v.setBackgroundColor(Color.TRANSPARENT);
                         v.setSelected(false);
                     }
-                }
-            selectedViews = null;
+                }*/
+            adapter.clean();
             selectedJobs = null;
             mActionMode = null;
         }

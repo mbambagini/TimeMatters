@@ -24,11 +24,11 @@
         <activity
             android:name=".activities.SaveActivity"
             android:label="@string/title_activity_save"
-            android:parentActivityName=".activities.MainActivity"></activity>
+            android:parentActivityName=".activities.MainActivity" />
         <activity
             android:name=".activities.NewActivity"
             android:label="@string/title_activity_new"
-            android:parentActivityName=".activities.MainActivity"></activity>
+            android:parentActivityName=".activities.MainActivity" />
 
     </application>
 

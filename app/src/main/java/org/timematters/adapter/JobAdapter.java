@@ -38,10 +38,12 @@ public class JobAdapter extends ArrayAdapter<JobEntry> {
     }
 
     public void setSelection (Long id, boolean b) {
-        if (b)
-            selections.add(id);
-        else
+        if (b == false) {
             selections.remove(id);
+        } else {
+            if (selections.contains(id) == false)
+                selections.add(id);
+        }
     }
 
     @Override
@@ -62,8 +64,6 @@ public class JobAdapter extends ArrayAdapter<JobEntry> {
         holder.time.setText(DateHandler.GetElapsedTime(jobs.get(position).getDuration()));
         holder.note.setText(jobs.get(position).getDescr());
         holder.id.setText(Long.toString(jobs.get(position).getId()));
-        //view.setSelected(true);
-        //view.refreshDrawableState();
         if (selections.contains(jobs.get(position).getId()))
             view.setBackgroundColor(getContext().getResources().getColor(R.color.selected_job));
         else
@@ -71,4 +71,7 @@ public class JobAdapter extends ArrayAdapter<JobEntry> {
         return view;
     }
 
+    public void clean () {
+        selections.clear();
+    }
 }
