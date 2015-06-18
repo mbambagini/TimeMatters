@@ -12,6 +12,7 @@ import org.timematters.misc.DateHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
 
 /**
  * JobEntry adapter
@@ -21,14 +22,12 @@ public class JobAdapter extends ArrayAdapter<JobEntry> {
     private final Activity context;
     private final List<JobEntry> jobs;
 
-    private final ArrayList<Boolean> selections = new ArrayList<>();
+    private final ArrayList<Long> selections = new ArrayList<>();
 
     public JobAdapter(Activity context, int textViewResourceId, List<JobEntry> values) {
         super(context, textViewResourceId, values);
         this.context = context;
         jobs = values;
-        for (int i=0; i<jobs.size(); i++)
-            selections.add(false);
     }
 
     static class ViewHolder {
@@ -38,9 +37,11 @@ public class JobAdapter extends ArrayAdapter<JobEntry> {
         public TextView id;
     }
 
-    public void setSelection (int position, boolean b) {
-        if (position<selections.size())
-            selection.set(position, b);
+    public void setSelection (Long id, boolean b) {
+        if (b)
+            selection.add(id);
+        else
+            selection.remove(id);
     }
 
     @Override
@@ -63,7 +64,7 @@ public class JobAdapter extends ArrayAdapter<JobEntry> {
         holder.id.setText(Long.toString(jobs.get(position).getId()));
         //view.setSelected(true);
         //view.refreshDrawableState();
-        if (selections.get(position))
+        if (selections.contains(jobs.get(position).getId()))
              view.setBackgroundColor(getResources().getColor(R.color.selected_job));
         else
             v.setBackgroundColor(Color.TRANSPARENT);
