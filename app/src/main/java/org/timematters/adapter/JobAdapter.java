@@ -38,10 +38,10 @@ public class JobAdapter extends ArrayAdapter<JobEntry> {
     }
 
     public void setSelection (Long id, boolean b) {
-        if (b == false) {
+        if (!b) {
             selections.remove(id);
         } else {
-            if (selections.contains(id) == false)
+            if (!selections.contains(id))
                 selections.add(id);
         }
     }

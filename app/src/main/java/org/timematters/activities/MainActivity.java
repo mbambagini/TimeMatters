@@ -32,6 +32,7 @@ import org.timematters.misc.NotificationWrapper;
 import org.timematters.misc.States;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
@@ -150,7 +151,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             public void onItemClick(AdapterView<?> arg0, View view, int arg2, long arg3) {
                 if (mementoHandler.isSelectionMode()) {
                     TextView txt = (TextView)view.findViewById(R.id.txt_job_id);
-                    System.out.println("SELECTED: "+Long.parseLong(txt.getText().toString()));
                     if (txt!=null)
                         mementoHandler.toggleJob(view, Long.parseLong(txt.getText().toString()));
                 }
@@ -160,7 +160,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 TextView txt = (TextView)view.findViewById(R.id.txt_job_id);
-                System.out.println("SELECTED: "+Long.parseLong(txt.getText().toString()));
                 if (txt!=null)
                     mementoHandler.toggleJob(view, Long.parseLong(txt.getText().toString()));
                 return true;
@@ -331,6 +330,16 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                 DatePicker datePickerFrom = (DatePicker) findViewById(R.id.datePickerSearchFrom);
                 DatePicker datePickerTo = (DatePicker) findViewById(R.id.datePickerSearchUntil);
                 if ((datePickerFrom != null) && (datePickerTo != null)) {
+
+                    Calendar cal = Calendar.getInstance();
+                    //cal.setTime(DateHandler.GetActualDate());
+                    cal.set(Calendar.YEAR, datePickerFrom.getYear());
+                    cal.set(Calendar.MONTH, datePickerFrom.getMonth());
+                    cal.set(Calendar.DAY_OF_MONTH, datePickerFrom.getDayOfMonth());
+                    cal.set(Calendar.MINUTE, 0);
+                    cal.set(Calendar.HOUR, 0);
+                    first_date = cal.getTime();
+                    /*
                     first_date = new Date();
                     first_date.setYear(datePickerFrom.getYear() - 1900);
                     first_date.setMonth(datePickerFrom.getMonth());
@@ -343,6 +352,16 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                     second_date.setDate(datePickerTo.getDayOfMonth());
                     second_date.setMinutes(0);
                     second_date.setHours(0);
+                    */
+                    cal = Calendar.getInstance();
+                    //cal.setTime(DateHandler.GetActualDate());
+                    cal.set(Calendar.YEAR, datePickerTo.getYear());
+                    cal.set(Calendar.MONTH, datePickerTo.getMonth());
+                    cal.set(Calendar.DAY_OF_MONTH, datePickerTo.getDayOfMonth());
+                    cal.set(Calendar.MINUTE, 0);
+                    cal.set(Calendar.HOUR, 0);
+                    second_date = cal.getTime();
+
                     if (second_date.compareTo(first_date) >= 0) {
                         internal_layout = Layouts.LAYOUT_LIST;
                         setLayout();
@@ -578,17 +597,15 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         synchronized private void selectJob(View v, Long id) {
             if (selectedJobs == null)
                 selectedJobs = new ArrayList<>();
-            if (selectedJobs.contains(id)==false)
+            if (!selectedJobs.contains(id))
                 selectedJobs.add(id);
             if (adapter!=null)
                 adapter.setSelection(id, true);
             v.setSelected(true);
             v.setBackgroundColor(getResources().getColor(R.color.selected_job));
-            System.out.println("SELEZIONATO "+id);
         }
 
         synchronized private void deselectJob(View v, Long id) {
-            System.out.println("DE-SELEZIONATO "+id);
             if (selectedJobs != null)
                 selectedJobs.remove(id);
             v.setBackgroundColor(Color.TRANSPARENT);
@@ -603,13 +620,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             return deletedCount;
         }
 
-        /*
-                synchronized public int getSelectedJobs () {
-                    if (selectedJobs!=null)
-                        return selectedJobs.size();
-                    return 0;
-                }
-        */
         private void deleteJobs() {
             deletedCount = 0;
             if (memento == null)
