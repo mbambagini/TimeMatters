@@ -1,12 +1,12 @@
 package org.timematters.adapter;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-
 import org.timematters.R;
 import org.timematters.database.JobEntry;
 import org.timematters.misc.DateHandler;
@@ -22,12 +22,26 @@ public class JobAdapter extends ArrayAdapter<JobEntry> {
     private final Activity context;
     private final List<JobEntry> jobs;
 
-    private final ArrayList<Boolean> selections = new ArrayList<>();
+    private final ArrayList<Long> selections = new ArrayList<>();
 
     public JobAdapter(Activity context, int textViewResourceId, List<JobEntry> values) {
         super(context, textViewResourceId, values);
         this.context = context;
         jobs = values;
+    }
+
+    static class ViewHolder {
+        public TextView when;
+        public TextView time;
+        public TextView note;
+        public TextView id;
+    }
+
+    public void setSelection (Long id, boolean b) {
+        if (b)
+            selections.add(id);
+        else
+            selections.remove(id);
     }
 
     @Override
@@ -37,10 +51,10 @@ public class JobAdapter extends ArrayAdapter<JobEntry> {
             LayoutInflater inflater = context.getLayoutInflater();
             view = inflater.inflate(R.layout.job_item, null);
             ViewHolder viewHolder = new ViewHolder();
-            viewHolder.when = (TextView) view.findViewById(R.id.txt_job_when);
-            viewHolder.time = (TextView) view.findViewById(R.id.txt_job_duration);
-            viewHolder.note = (TextView) view.findViewById(R.id.txt_job_note);
-            viewHolder.id = (TextView) view.findViewById(R.id.txt_job_id);
+            viewHolder.when = (TextView)view.findViewById(R.id.txt_job_when);
+            viewHolder.time = (TextView)view.findViewById(R.id.txt_job_duration);
+            viewHolder.note = (TextView)view.findViewById(R.id.txt_job_note);
+            viewHolder.id = (TextView)view.findViewById(R.id.txt_job_id);
             view.setTag(viewHolder);
         }
         ViewHolder holder = (ViewHolder) view.getTag();
@@ -48,16 +62,13 @@ public class JobAdapter extends ArrayAdapter<JobEntry> {
         holder.time.setText(DateHandler.GetElapsedTime(jobs.get(position).getDuration()));
         holder.note.setText(jobs.get(position).getDescr());
         holder.id.setText(Long.toString(jobs.get(position).getId()));
-        view.setSelected(true);
-        view.refreshDrawableState();
+        //view.setSelected(true);
+        //view.refreshDrawableState();
+        if (selections.contains(jobs.get(position).getId()))
+            view.setBackgroundColor(getContext().getResources().getColor(R.color.selected_job));
+        else
+            view.setBackgroundColor(Color.TRANSPARENT);
         return view;
-    }
-
-    static class ViewHolder {
-        public TextView when;
-        public TextView time;
-        public TextView note;
-        public TextView id;
     }
 
 }
