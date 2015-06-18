@@ -27,6 +27,8 @@ public class JobAdapter extends ArrayAdapter<JobEntry> {
         super(context, textViewResourceId, values);
         this.context = context;
         jobs = values;
+        for (int i=0; i<jobs.size(); i++)
+            selections.add(false);
     }
 
     static class ViewHolder {
@@ -34,6 +36,11 @@ public class JobAdapter extends ArrayAdapter<JobEntry> {
         public TextView time;
         public TextView note;
         public TextView id;
+    }
+
+    public void setSelection (int position, boolean b) {
+        if (position<selections.size())
+            selection.set(position, b);
     }
 
     @Override
@@ -54,8 +61,12 @@ public class JobAdapter extends ArrayAdapter<JobEntry> {
         holder.time.setText(DateHandler.GetElapsedTime(jobs.get(position).getDuration()));
         holder.note.setText(jobs.get(position).getDescr());
         holder.id.setText(Long.toString(jobs.get(position).getId()));
-        view.setSelected(true);
-        view.refreshDrawableState();
+        //view.setSelected(true);
+        //view.refreshDrawableState();
+        if (selections.get(position))
+             view.setBackgroundColor(getResources().getColor(R.color.selected_job));
+        else
+            v.setBackgroundColor(Color.TRANSPARENT);
         return view;
     }
 
