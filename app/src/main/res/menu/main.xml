@@ -1,14 +1,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
 
-    <item android:id="@+id/action_share" android:title="@string/action_share" android:icon="@android:drawable/ic_menu_share"
-        android:orderInCategory="100" android:showAsAction="ifRoom|withText"/>
+    <item
+        android:id="@+id/action_share"
+        android:icon="@android:drawable/ic_menu_share"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/action_share" />
 
-    <item android:id="@+id/action_new" android:title="@string/action_new" android:icon="@android:drawable/ic_menu_add"
-        android:orderInCategory="100" android:showAsAction="ifRoom|withText"/>
-<!--
-    <item android:id="@+id/action_export" android:title="@string/action_export" android:icon="@android:drawable/ic_menu_save"
-        android:orderInCategory="100" android:showAsAction="ifRoom|withText"/>
--->
+    <item
+        android:id="@+id/action_new"
+        android:icon="@android:drawable/ic_menu_add"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/action_new" />
+    <!--
+        <item android:id="@+id/action_export" android:title="@string/action_export" android:icon="@android:drawable/ic_menu_save"
+            android:orderInCategory="100" android:showAsAction="ifRoom|withText"/>
+    -->
 </menu>

@@ -1,7 +1,7 @@
 package org.timematters.activities;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,8 +31,8 @@ public class SaveActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_save);
 
-        TextView txt_when = (TextView)findViewById(R.id.txt_summary_day);
-        TextView txt_duration = (TextView)findViewById(R.id.txt_summary_elapsed_time);
+        TextView txt_when = (TextView) findViewById(R.id.txt_summary_day);
+        TextView txt_duration = (TextView) findViewById(R.id.txt_summary_elapsed_time);
 
         Date actual_date = new Date();
         duration = getIntent().getExtras().getLong(getString(R.string.elapsed_time_id));
@@ -44,11 +44,11 @@ public class SaveActivity extends ActionBarActivity {
     /*!
      * Store information
      */
-    public void onClickUpperButtons (View view) {
+    public void onClickUpperButtons(View view) {
         JobEntry job;
         boolean created = true;
 
-        if (view.getId()==R.id.btn_save) {
+        if (view.getId() == R.id.btn_save) {
             job = new JobEntry();
             job.setDuration(duration);
             job.setStop(internal_date);

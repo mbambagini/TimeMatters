@@ -25,13 +25,13 @@ public class JobStorage {
     /**
      * Save the information permanently
      */
-    static public boolean setPendingJob (Context c, long duration, long actual_time) {
+    static public boolean setPendingJob(Context c, long duration, long actual_time) {
         FileOutputStream fos;
         DataOutputStream os;
 
         try {
             fos = c.openFileOutput(FILENAME, Context.MODE_PRIVATE);
-            if (fos==null)
+            if (fos == null)
                 return false;
             os = new DataOutputStream(fos);
             os.writeLong(duration);
@@ -56,7 +56,7 @@ public class JobStorage {
     /**
      * Retrieve the stored information
      */
-    static public long getPendingJob (Context c, long actual_time, long def) {
+    static public long getPendingJob(Context c, long actual_time, long def) {
         FileInputStream fos;
         DataInputStream is;
         long stop_time;
@@ -64,7 +64,7 @@ public class JobStorage {
 
         try {
             fos = c.openFileInput(FILENAME);
-            if (fos==null)
+            if (fos == null)
                 return def;
             is = new DataInputStream(fos);
             duration = is.readLong();
@@ -78,8 +78,8 @@ public class JobStorage {
         } catch (NumberFormatException e) {
             return def;
         }
-        System.out.println("DURATION "+duration + " start "+stop_time+ " act "+actual_time);
-        return (actual_time-stop_time)+duration;
+        System.out.println("DURATION " + duration + " start " + stop_time + " act " + actual_time);
+        return (actual_time - stop_time) + duration;
     }
 
 }

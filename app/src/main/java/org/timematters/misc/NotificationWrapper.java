@@ -26,7 +26,7 @@ public class NotificationWrapper {
     /**
      * Create and show a notification
      */
-    public void create (Context c) {
+    public void create(Context c) {
         //Intent intent = new Intent(c, SaveActivity.class);
         //PendingIntent pIntent = PendingIntent.getActivity(c, 0, intent, 0);
 
@@ -41,16 +41,16 @@ public class NotificationWrapper {
         PendingIntent resultPendingIntent = PendingIntent.getActivity(c, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         mBuilder.setContentIntent(resultPendingIntent);
-        mNotificationManager = (NotificationManager)c.getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(mid, mBuilder.build());
     }
 
     /**
      * Destroy the notification object, removing it from the notification area
      */
-    public void destroy (Context c) {
+    public void destroy(Context c) {
         if (mNotificationManager == null)
-            mNotificationManager = (NotificationManager)c.getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel(mid);
         mNotificationManager = null;
     }
@@ -58,15 +58,15 @@ public class NotificationWrapper {
     /**
      * Update the content of the notification by writing the actual elapsed time
      */
-    public void update (Context c, long duration) {
-        if (mNotificationManager==null || mBuilder==null)
+    public void update(Context c, long duration) {
+        if (mNotificationManager == null || mBuilder == null)
             return;
 
         Intent resultIntent = new Intent(c, MainActivity.class);
-        resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(c, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(resultPendingIntent);
-        mBuilder.setContentText(c.getResources().getString(R.string.text_elapsed_time)+" "+ DateHandler.GetElapsedTime(duration));
+        mBuilder.setContentText(c.getResources().getString(R.string.text_elapsed_time) + " " + DateHandler.GetElapsedTime(duration));
         mNotificationManager.notify(mid, mBuilder.build());
     }
 

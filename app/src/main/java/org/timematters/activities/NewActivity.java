@@ -1,7 +1,7 @@
 package org.timematters.activities;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,14 +28,14 @@ public class NewActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new);
 
-        TimePicker timePicker = (TimePicker)findViewById(R.id.timePickerTotalTime);
-        if (timePicker!=null) {
+        TimePicker timePicker = (TimePicker) findViewById(R.id.timePickerTotalTime);
+        if (timePicker != null) {
             timePicker.setIs24HourView(true);
             timePicker.setCurrentHour(8);
             timePicker.setCurrentMinute(0);
         }
-        DatePicker datePicker = (DatePicker)findViewById(R.id.datePickerNewActivity);
-        if (datePicker!=null)
+        DatePicker datePicker = (DatePicker) findViewById(R.id.datePickerNewActivity);
+        if (datePicker != null)
             datePicker.setMaxDate(System.currentTimeMillis());
     }
 
@@ -53,33 +53,33 @@ public class NewActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if ((id==R.id.action_save_new) && saveActivity())
+        if ((id == R.id.action_save_new) && saveActivity())
             finish();
 
         return super.onOptionsItemSelected(item);
     }
 
     public void onClickUpperButtons(View v) {
-        if ((v.getId()==R.id.btn_save_new) && saveActivity())
-                finish();
+        if ((v.getId() == R.id.btn_save_new) && saveActivity())
+            finish();
     }
 
-    public boolean saveActivity () {
-        DatePicker datePicker = (DatePicker)findViewById(R.id.datePickerNewActivity);
-        TimePicker timePicker = (TimePicker)findViewById(R.id.timePickerTotalTime);
-        EditText note = (EditText)findViewById(R.id.txt_new_note);
+    public boolean saveActivity() {
+        DatePicker datePicker = (DatePicker) findViewById(R.id.datePickerNewActivity);
+        TimePicker timePicker = (TimePicker) findViewById(R.id.timePickerTotalTime);
+        EditText note = (EditText) findViewById(R.id.txt_new_note);
         if ((datePicker == null) || (timePicker == null) || (note == null))
             return false;
 
-        long duration = (timePicker.getCurrentHour()*3600+timePicker.getCurrentMinute()*60)*1000;
+        long duration = (timePicker.getCurrentHour() * 3600 + timePicker.getCurrentMinute() * 60) * 1000;
 
         JobEntries db = new JobEntries(this);
         db.open();
         JobEntry job = new JobEntry();
-        if (note.getText().toString()!=null)
+        if (note.getText().toString() != null)
             job.setDescr(note.getText().toString());
         Date date = new Date();
-        date.setYear(datePicker.getYear()-1900);
+        date.setYear(datePicker.getYear() - 1900);
         date.setMonth(datePicker.getMonth());
         date.setDate(datePicker.getDayOfMonth());
         date.setMinutes(0);

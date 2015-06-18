@@ -22,10 +22,10 @@
     <string name="action_save">Save</string>
     <string name="action_new">Add activity</string>
     <string name="action_settings">Settings</string>
-<!--
-    <string name="action_export">Export as XML</string>
-    <string name="action_import">Import XML</string>
--->
+    <!--
+        <string name="action_export">Export as XML</string>
+        <string name="action_import">Import XML</string>
+    -->
 
     <!-- Simple words -->
     <string name="text_from">From</string>
@@ -72,13 +72,13 @@
     <string name="tst_event_not_created">Entry not saved</string>
     <string name="tst_job_resumed">Activity resumed</string>
     <string name="tst_no_share">Impossible to share activities</string>
-<!--
-    <string name="tst_export_ok">Activities saved successfully</string>
-    <string name="tst_export_no">Impossible to save the file</string>
-    <string name="tst_export_already">The file already exists</string>
-    <string name="tst_export_empty">No activity to save</string>
-    <string name="tst_export_unmount">Media not mounted</string>
--->
+    <!--
+        <string name="tst_export_ok">Activities saved successfully</string>
+        <string name="tst_export_no">Impossible to save the file</string>
+        <string name="tst_export_already">The file already exists</string>
+        <string name="tst_export_empty">No activity to save</string>
+        <string name="tst_export_unmount">Media not mounted</string>
+    -->
     <string name="msg_undo_not_possible">Error while restoring activities</string>
 
     <!-- Notification -->
