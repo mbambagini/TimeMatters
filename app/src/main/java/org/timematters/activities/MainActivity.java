@@ -254,9 +254,9 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         if (!mNavigationDrawerFragment.isDrawerOpen()) {
             switch (internal_layout) {
                 case LAYOUT_LIST:
+                case LAYOUT_SEARCH:
                     getMenuInflater().inflate(R.menu.main, menu);
                     break;
-                case LAYOUT_SEARCH:
                 case LAYOUT_TRACKING:
                 case LAYOUT_ABOUT:
                 default:
@@ -576,7 +576,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         if (second_date == null)
             return null;
 
-        String body = null;
+        String body = "";
         long total = 0;
         JobEntries jobs = new JobEntries(this);
         jobs.open();
@@ -588,7 +588,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             for (int i = 0; i < list.size(); i++) {
                 JobEntry entry = list.get(i);
                 if (entry != null) {
-                    body = DateHandler.GetPreferenceDateFormat(entry.getStop()) + ":  " +
+                    body += DateHandler.GetPreferenceDateFormat(entry.getStop()) + ":  " +
                             DateHandler.GetElapsedTime(entry.getDuration()) + "\n";
                     total += entry.getDuration();
                 } else
@@ -601,14 +601,16 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             header = getString(R.string.str_all_activities) + " " +
                         getString(R.string.text_until) + " " +
                         DateHandler.GetPreferenceDateFormat(second_date) + " (" +
-                        getString(R.string.text_hours) + DateHandler.GetElapsedTime(total) + "):\n";
+                        getString(R.string.text_hours) + " " +
+                        DateHandler.GetElapsedTime(total) + "):\n";
         } else {
             header = getString(R.string.str_all_activities) + " " +
                         getString(R.string.text_from) + " " +
                         DateHandler.GetPreferenceDateFormat(first_date) + " " +
                         getString(R.string.text_to) + " " +
                         DateHandler.GetPreferenceDateFormat(second_date) + " (" +
-                        getString(R.string.text_hours) + DateHandler.GetElapsedTime(total) + "):\n";
+                        getString(R.string.text_hours) + " " +
+                        DateHandler.GetElapsedTime(total) + "):\n";
         }
 
         if (body == null)
