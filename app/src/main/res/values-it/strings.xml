@@ -23,8 +23,9 @@
     <string name="action_new">Aggiungi attivit&#x00E0;</string>
 
     <!-- Simple words -->
-    <string name="text_from">Da</string>
+    <string name="text_from">da</string>
     <string name="text_to">a</string>
+    <string name="text_until">fino</string>
     <string name="text_search">Cerca</string>
     <string name="text_when">Quando</string>
     <string name="text_hours">Tempo totale</string>
@@ -69,4 +70,8 @@
     <!-- Notification -->
     <string name="notification_title">TimeMatters - attivit&#x00E0; avviata</string>
 
+    <!-- Export messages -->
+    <string name="str_no_activities">Nessuna attivit&#x00E0; trovata</string>
+    <string name="str_all_activities">Tutte le attivit&#x00E0;</string>
+    
 </resources>
