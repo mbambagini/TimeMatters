@@ -523,7 +523,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     private void deleteJobs() {
         mementoHandler.deleteSelectedJobs();
         jobs.close();
-        fillList(first_data, second_data);
+        fillList(first_date, second_date);
         showUndo();
     }
 

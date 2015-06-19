@@ -79,9 +79,6 @@ public class NewActivity extends ActionBarActivity {
         JobEntry job = new JobEntry();
         if (note.getText().toString() != null)
             job.setDescr(note.getText().toString());
-
-
-
         Calendar cal = Calendar.getInstance();
         //cal.setTime(DateHandler.GetActualDate());
         cal.set(Calendar.YEAR, datePicker.getYear());
@@ -90,13 +87,6 @@ public class NewActivity extends ActionBarActivity {
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.HOUR, 0);
         Date date = cal.getTime();
-/*
-        date.setYear(datePicker.getYear() - 1900);
-        date.setMonth(datePicker.getMonth());
-        date.setDate(datePicker.getDayOfMonth());
-        date.setMinutes(0);
-        date.setHours(0);
-*/
         job.setStop(DateHandler.GetSQLDateFormat(date));
         job.setDuration(duration);
         try {

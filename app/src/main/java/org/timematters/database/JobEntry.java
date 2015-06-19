@@ -56,7 +56,7 @@ public class JobEntry implements Comparable<JobEntry> {
     public int compareTo(@Nullable JobEntry another) {
         if (another == null)
             return 0;
-        return stop.compareTo(another.stop);
+        return another.stop.compareTo(stop);
     }
 
     @Override
