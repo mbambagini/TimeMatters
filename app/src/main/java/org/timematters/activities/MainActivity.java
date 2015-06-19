@@ -45,6 +45,9 @@ import java.util.TimerTask;
  */
 public class MainActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
+    /**
+     * time after which the tracking (elapsed time) is updated
+     */
     static private final long period_1s = 1000;
 
     /**
@@ -72,11 +75,35 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
      * Current state of the tracking feature
      */
     private States internal_state = States.STATE_IDLE;
+
+    /**
+     * data used to filter activity result
+     */
     private Date first_date = null;
+
+    /**
+     * data used to filter activity result
+     */
     private Date second_date = null;
+    
+    /**
+     * Object in charge of handling the notification bar when the activity becomes active/not active
+     */
     private NotificationWrapper notifier = null;
+    
+    /**
+     * Elapsed time of the actual tracking: relative interval
+     */
     private long total_time = 0;
+    
+    /**
+     * Elapsed time of the actual tracking: absolute time
+     */
     private long elapsed_time = 0;
+    
+    /**
+     * Timer which updates periodically (wrt period_1s) the tracking
+     */
     private Timer timer = new Timer();
 
     private Runnable tick = new Runnable() {
@@ -85,8 +112,15 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             update_time();
         }
     };
+    
+    /**
+     * Object which implements the Memento design pattern
+     */
     private Memento mementoHandler;
+    
     private JobEntries jobs;
+
+    //action mode handler
     private ActionMode.Callback actionModeCallback = new ActionMode.Callback() {
 
         // Called when the action mode is created; startActionMode() was called
@@ -97,8 +131,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         }
 
         // Called each time the action mode is shown. Always called after
-        // onCreateActionMode, but
-        // may be called multiple times if the mode is invalidated.
+        // onCreateActionMode, but may be called multiple times if the mode is invalidated.
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
             return false;
         }
@@ -332,36 +365,19 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                 if ((datePickerFrom != null) && (datePickerTo != null)) {
 
                     Calendar cal = Calendar.getInstance();
-                    //cal.setTime(DateHandler.GetActualDate());
                     cal.set(Calendar.YEAR, datePickerFrom.getYear());
                     cal.set(Calendar.MONTH, datePickerFrom.getMonth());
                     cal.set(Calendar.DAY_OF_MONTH, datePickerFrom.getDayOfMonth());
                     cal.set(Calendar.MINUTE, 0);
                     cal.set(Calendar.HOUR, 0);
                     first_date = cal.getTime();
-                    /*
-                    first_date = new Date();
-                    first_date.setYear(datePickerFrom.getYear() - 1900);
-                    first_date.setMonth(datePickerFrom.getMonth());
-                    first_date.setDate(datePickerFrom.getDayOfMonth());
-                    first_date.setMinutes(0);
-                    first_date.setHours(0);
-                    second_date = new Date();
-                    second_date.setYear(datePickerTo.getYear() - 1900);
-                    second_date.setMonth(datePickerTo.getMonth());
-                    second_date.setDate(datePickerTo.getDayOfMonth());
-                    second_date.setMinutes(0);
-                    second_date.setHours(0);
-                    */
                     cal = Calendar.getInstance();
-                    //cal.setTime(DateHandler.GetActualDate());
                     cal.set(Calendar.YEAR, datePickerTo.getYear());
                     cal.set(Calendar.MONTH, datePickerTo.getMonth());
                     cal.set(Calendar.DAY_OF_MONTH, datePickerTo.getDayOfMonth());
                     cal.set(Calendar.MINUTE, 0);
                     cal.set(Calendar.HOUR, 0);
                     second_date = cal.getTime();
-
                     if (second_date.compareTo(first_date) >= 0) {
                         internal_layout = Layouts.LAYOUT_LIST;
                         setLayout();
@@ -374,9 +390,14 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         }
     }
 
+    /**
+     * Manage the elements in the result list
+     */
     private JobAdapter adapter = null;
 
-    /* show list */
+    /**
+     * show the result list according to first_date and second_date
+     */
     private void fillList(Date start, Date stop) {
         JobEntries jobs = new JobEntries(this);
         jobs.open();
@@ -418,6 +439,9 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     }
     */
 
+    /**
+     * Start the tracking: set values, make the timer start and set the callback
+     */
     private void start_counter(long offset) {
         total_time = offset;
         elapsed_time = System.currentTimeMillis();
@@ -429,6 +453,9 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         }, 0, period_1s);
     }
 
+    /**
+     * Periodic update of the tracking
+     */
     private void update_time() {
         if (internal_state == States.STATE_RUNNING) {
             long curr = System.currentTimeMillis();
@@ -445,6 +472,9 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         this.runOnUiThread(tick);
     }
 
+    /**
+     * Set the appropriate layout (fragment to show) wrt internal_layout
+     */
     private void setLayout() {
         FrameLayout tmp = null;
         switch (internal_layout) {
@@ -487,15 +517,22 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         /* to be optimized: do not change the layout when it is the same */
     }
 
+    /**
+     * Delete the selected activities and activate mememto
+     */
     private void deleteJobs() {
         mementoHandler.deleteSelectedJobs();
         jobs.close();
-        fillList(null, DateHandler.GetActualDate());
+        fillList(first_data, second_data);
         showUndo();
     }
 
+    /**
+     * show the undo bar after a delection and implement the following behaviors:
+     * - time expires: confirm delection
+     * - undo pressed: restore activities
+     */
     private void showUndo() {
-        //findViewById(R.id.sample_content_fragment).setVisibility(View.GONE);
         final View view = findViewById(R.id.undobar);
         view.setVisibility(View.VISIBLE);
         view.setAlpha(1);
@@ -514,8 +551,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             synchronized public void run() {
                 view.setVisibility(View.GONE);
                 fillList(first_date, second_date);
-//                if (internal_layout==Layouts.LAYOUT_LIST)
-//                    findViewById(R.id.sample_content_fragment).setVisibility(View.VISIBLE);
                 mementoHandler.discardData();
             }
         });
