@@ -528,7 +528,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     }
 
     /**
-     * show the undo bar after a delection and implement the following behaviors:
+     * Show the undo bar after a delection and implement the following behaviors:
      * - time expires: confirm delection
      * - undo pressed: restore activities
      */
@@ -556,9 +556,11 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         });
     }
 
+    /**
+     * Restore deleted activities
+     */
     public void undoDelection(View view) {
         findViewById(R.id.undobar).setVisibility(View.GONE);
-//        findViewById(R.id.sample_content_fragment).setVisibility(View.VISIBLE);
         if (mementoHandler.undo()) {
             fillList(first_date, second_date);
         } else
@@ -567,8 +569,11 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                     Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * Build the string which is gonna be shared
+     */
     private String buildString() {
-        if (first_date == null && second_date == null)
+        if (second_date == null)
             return null;
 
         String body = null;
@@ -578,12 +583,13 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         List<JobEntry> list = jobs.getJobs(first_date, second_date);
         jobs.close();
         if (list == null || list.size() == 0) {
-            body = "No activity stored";
+            body = getString(R.string.str_no_activities);
         } else {
             for (int i = 0; i < list.size(); i++) {
                 JobEntry entry = list.get(i);
                 if (entry != null) {
-                    body = DateHandler.GetPreferenceDateFormat(entry.getStop()) + ":  " + DateHandler.GetElapsedTime(entry.getDuration()) + "\n";
+                    body = DateHandler.GetPreferenceDateFormat(entry.getStop()) + ":  " +
+                            DateHandler.GetElapsedTime(entry.getDuration()) + "\n";
                     total += entry.getDuration();
                 } else
                     body = "";
@@ -592,9 +598,17 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
         String header;
         if (first_date == null) {
-            header = "All activities until " + DateHandler.GetPreferenceDateFormat(second_date) + " (total time " + DateHandler.GetElapsedTime(total) + "):\n";
+            header = getString(R.string.str_all_activities) + " " +
+                        getString(R.string.text_until) + " " +
+                        DateHandler.GetPreferenceDateFormat(second_date) + " (" +
+                        getString(R.string.text_hours) + DateHandler.GetElapsedTime(total) + "):\n";
         } else {
-            header = "All activities from " + DateHandler.GetPreferenceDateFormat(first_date) + " to " + DateHandler.GetPreferenceDateFormat(second_date) + " (total time " + DateHandler.GetElapsedTime(total) + "):\n";
+            header = getString(R.string.str_all_activities) + " " +
+                        getString(R.string.text_from) + " " +
+                        DateHandler.GetPreferenceDateFormat(first_date) + " " +
+                        getString(R.string.text_to) + " " +
+                        DateHandler.GetPreferenceDateFormat(second_date) + " (" +
+                        getString(R.string.text_hours) + DateHandler.GetElapsedTime(total) + "):\n";
         }
 
         if (body == null)
@@ -602,6 +616,9 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         return header + body;
     }
 
+    /**
+     * Memento pattern implementation
+     */
     private class Memento {
         private ActionMode mActionMode = null;
 
@@ -688,13 +705,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         }
 
         synchronized public void destroyMode() {
-/*            if (selectedViews != null)
-                for (View v : selectedViews) {
-                    if (v != null) {
-                        v.setBackgroundColor(Color.TRANSPARENT);
-                        v.setSelected(false);
-                    }
-                }*/
             adapter.clean();
             selectedJobs = null;
             mActionMode = null;
