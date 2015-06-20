@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.timematters">
 
+    <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="21"/>
+
     <!--
         <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
         <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -29,7 +31,6 @@
             android:name=".activities.NewActivity"
             android:label="@string/title_activity_new"
             android:parentActivityName=".activities.MainActivity" />
-
     </application>
 
 </manifest>
