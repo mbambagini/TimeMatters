@@ -23,7 +23,9 @@
     <string name="action_new">Aggiungi attivit&#x00E0;</string>
 
     <!-- Simple words -->
+    <string name="text_undo">annulla</string>
     <string name="text_from">da</string>
+    <string name="text_capitol_from">Da</string>
     <string name="text_to">a</string>
     <string name="text_until">fino</string>
     <string name="text_search">Cerca</string>
@@ -68,7 +70,10 @@
     <string name="msg_undo_not_possible">Impossibile ripristinare le attivit&#x00E0;</string>
 
     <!-- Notification -->
-    <string name="notification_title">TimeMatters - attivit&#x00E0; avviata</string>
+    <!-- <string name="notification_title">TimeMatters - attivit&#x00E0; avviata</string> -->
+    <string name="notification_title">TimeMatters</string>
+    <string name="notification_subtitle_run">Attivit&#x00E0; avviata</string>
+    <string name="notification_subtitle_pause">Attivit&#x00E0; sospesa</string>
 
     <!-- Export messages -->
     <string name="str_no_activities">Nessuna attivit&#x00E0; trovata</string>

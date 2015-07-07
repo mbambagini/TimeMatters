@@ -254,10 +254,10 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         if (!mNavigationDrawerFragment.isDrawerOpen()) {
             switch (internal_layout) {
                 case LAYOUT_LIST:
-                case LAYOUT_SEARCH:
                     getMenuInflater().inflate(R.menu.main, menu);
                     break;
                 case LAYOUT_TRACKING:
+                case LAYOUT_SEARCH:
                 case LAYOUT_ABOUT:
                 default:
                     getMenuInflater().inflate(R.menu.main_reduced, menu);
@@ -321,12 +321,20 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     @Override
     protected void onStop() {
         super.onStop();
-        if (internal_state == States.STATE_RUNNING) {
-            JobStorage.setPendingJob(this, total_time, System.currentTimeMillis());
-            notifier = new NotificationWrapper();
-            notifier.create(this);
-        } else {
-            JobStorage.removePendingJob(this);
+        if (mementoHandler != null)
+            mementoHandler.ignoreAction();
+        switch(internal_state) {
+            case STATE_RUNNING:
+                JobStorage.setPendingJob(this, total_time, System.currentTimeMillis());
+                notifier = new NotificationWrapper();
+                notifier.create(this, true);
+                break;
+            case STATE_BLOCKED:
+                notifier = new NotificationWrapper();
+                notifier.create(this, false);
+                break;
+            default:
+                JobStorage.removePendingJob(this);
         }
     }
 
@@ -463,8 +471,10 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             TextView txt = (TextView) findViewById(R.id.txt_time);
             txt.setText(DateHandler.GetElapsedTime(total_time));
             elapsed_time = System.currentTimeMillis();
+/*
             if (notifier != null)
                 notifier.update(this, total_time);
+*/
         }
     }
 
@@ -515,6 +525,8 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             actual_layout.setVisibility(View.VISIBLE);
         }
         /* to be optimized: do not change the layout when it is the same */
+        if (mementoHandler != null)
+            mementoHandler.ignoreAction();
     }
 
     /**
@@ -712,11 +724,11 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             mActionMode = null;
         }
 
-        /*
-                synchronized public void ignoreAction () {
-                    mActionMode.finish();
-                }
-        */
+        synchronized public void ignoreAction () {
+            if (mActionMode != null)
+                mActionMode.finish();
+        }
+
         synchronized public boolean undo() {
             boolean ret = true;
             if (memento == null)

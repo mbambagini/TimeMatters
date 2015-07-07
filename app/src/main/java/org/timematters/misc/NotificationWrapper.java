@@ -21,20 +21,26 @@ public class NotificationWrapper {
     private int mid = 999;
 
     private NotificationManager mNotificationManager = null;
-    private NotificationCompat.Builder mBuilder;
 
     /**
      * Create and show a notification
+     *
+     * @param c application context
+     * @param active_or_pause TRUE means that an activity is running, FALSE when it is paused
      */
-    public void create(Context c) {
+    public void create(Context c, boolean active_or_pause ) {
         //Intent intent = new Intent(c, SaveActivity.class);
         //PendingIntent pIntent = PendingIntent.getActivity(c, 0, intent, 0);
 
-        mBuilder = new NotificationCompat.Builder(c)
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(c)
                 .setAutoCancel(true)
                 .setSmallIcon(android.R.drawable.ic_media_play)
-                .setContentTitle(c.getResources().getString(R.string.notification_title))
-                .setContentText(c.getResources().getString(R.string.text_elapsed_time));
+                .setContentTitle(c.getResources().getString(R.string.notification_title));
+
+        if (active_or_pause)
+            mBuilder.setContentText(c.getResources().getString(R.string.notification_subtitle_run));
+        else
+            mBuilder.setContentText(c.getResources().getString(R.string.notification_subtitle_pause));
 
         Intent resultIntent = new Intent(c, MainActivity.class);
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -48,7 +54,7 @@ public class NotificationWrapper {
     /**
      * Destroy the notification object, removing it from the notification area
      */
-    public void destroy(Context c) {
+    public void destroy (Context c) {
         if (mNotificationManager == null)
             mNotificationManager = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel(mid);
@@ -58,6 +64,7 @@ public class NotificationWrapper {
     /**
      * Update the content of the notification by writing the actual elapsed time
      */
+    /*
     public void update(Context c, long duration) {
         if (mNotificationManager == null || mBuilder == null)
             return;
@@ -69,5 +76,6 @@ public class NotificationWrapper {
         mBuilder.setContentText(c.getResources().getString(R.string.text_elapsed_time) + " " + DateHandler.GetElapsedTime(duration));
         mNotificationManager.notify(mid, mBuilder.build());
     }
+    */
 
 }

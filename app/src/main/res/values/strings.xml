@@ -4,8 +4,8 @@
     <!-- Application and activity titles -->
     <string name="app_name">TimeMatters</string>
     <string name="app_version">v1.0</string>
-    <string name="title_activity_new">NewActivity</string>
-    <string name="title_activity_save">SaveActivity</string>
+    <string name="title_activity_new">New Activity</string>
+    <string name="title_activity_save">Save Activity</string>
 
     <!-- Navigation drawer -->
     <string name="title_home">Home</string>
@@ -24,7 +24,9 @@
     <string name="action_settings">Settings</string>
 
     <!-- Simple words -->
+    <string name="text_undo">undo</string>
     <string name="text_from">from</string>
+    <string name="text_capitol_from">From</string>
     <string name="text_to">to</string>
     <string name="text_until">until</string>
     <string name="text_search">Search</string>
@@ -72,7 +74,10 @@
     <string name="msg_undo_not_possible">Error while restoring activities</string>
 
     <!-- Notification -->
-    <string name="notification_title">TimeMatters - activity started</string>
+    <!-- <string name="notification_title">TimeMatters - activity started</string> -->
+    <string name="notification_title">TimeMatters</string>
+    <string name="notification_subtitle_run">Activity started</string>
+    <string name="notification_subtitle_pause">Activity suspended</string>
 
     <!-- Export messages -->
     <string name="str_no_activities">No activity stored</string>
