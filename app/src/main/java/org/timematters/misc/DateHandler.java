@@ -24,7 +24,7 @@ public class DateHandler {
         duration = duration / 60;
         long hours = duration;
 
-        if (hours > 10)
+        if (hours > 9)
             return formatterHours.format(hours) + ":" + formatter.format(minutes) + ":" + formatter.format(seconds);
         return formatter.format(hours) + ":" + formatter.format(minutes) + ":" + formatter.format(seconds);
     }
