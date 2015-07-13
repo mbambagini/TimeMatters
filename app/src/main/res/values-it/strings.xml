@@ -66,7 +66,7 @@
     <string name="tst_error_date">La seconda data deve essere maggiore della prima</string>
     <string name="tst_event_not_created">Elemento non salvato</string>
     <string name="tst_job_resumed">Attivit&#x00E0; ripresa</string>
-    <string name="tst_no_share">Impossibile condividere le attivit&#x00E0;</string>
+    <string name="tst_no_share">Nessuna attivit&#x00E0; da condividere</string>
     <string name="msg_undo_not_possible">Impossibile ripristinare le attivit&#x00E0;</string>
 
     <!-- Notification -->

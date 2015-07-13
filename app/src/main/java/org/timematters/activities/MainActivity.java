@@ -100,7 +100,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
      * Elapsed time of the actual tracking: absolute time
      */
     private long elapsed_time = 0;
-    
+
     /**
      * Timer which updates periodically (wrt period_1s) the tracking
      */
@@ -594,17 +594,15 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         jobs.open();
         List<JobEntry> list = jobs.getJobs(first_date, second_date);
         jobs.close();
-        if (list == null || list.size() == 0) {
-            body = getString(R.string.str_no_activities);
-        } else {
-            for (int i = 0; i < list.size(); i++) {
-                JobEntry entry = list.get(i);
-                if (entry != null) {
-                    body += DateHandler.GetPreferenceDateFormat(entry.getStop()) + ":  " +
-                            DateHandler.GetElapsedTime(entry.getDuration()) + "\n";
-                    total += entry.getDuration();
-                } else
-                    body = "";
+        if (list == null || list.size() == 0)
+            return null;
+
+        for (int i = 0; i < list.size(); i++) {
+            JobEntry entry = list.get(i);
+            if (entry != null) {
+                body += DateHandler.GetPreferenceDateFormat(entry.getStop()) + ":  " +
+                        DateHandler.GetElapsedTime(entry.getDuration()) + "\n";
+                total += entry.getDuration();
             }
         }
 
@@ -625,8 +623,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                         DateHandler.GetElapsedTime(total) + "):\n";
         }
 
-        if (body == null)
-            return header;
         return header + body;
     }
 

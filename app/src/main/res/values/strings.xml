@@ -70,7 +70,7 @@
     <string name="tst_error_date">Second date must be greater than the first</string>
     <string name="tst_event_not_created">Entry not saved</string>
     <string name="tst_job_resumed">Activity resumed</string>
-    <string name="tst_no_share">Impossible to share activities</string>
+    <string name="tst_no_share">No activity to share</string>
     <string name="msg_undo_not_possible">Error while restoring activities</string>
 
     <!-- Notification -->
