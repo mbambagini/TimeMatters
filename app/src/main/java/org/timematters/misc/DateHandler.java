@@ -16,7 +16,7 @@ public class DateHandler {
      */
     static public String GetElapsedTime(long duration) {
         DecimalFormat formatter = new DecimalFormat("00");
-        DecimalFormat formatterHours = new DecimalFormat("0000");
+        DecimalFormat formatterHours = new DecimalFormat();
         duration = duration / 1000;
         long seconds = duration % 60;
         duration = duration / 60;
@@ -24,7 +24,7 @@ public class DateHandler {
         duration = duration / 60;
         long hours = duration;
 
-        if (hours > 99)
+        if (hours > 10)
             return formatterHours.format(hours) + ":" + formatter.format(minutes) + ":" + formatter.format(seconds);
         return formatter.format(hours) + ":" + formatter.format(minutes) + ":" + formatter.format(seconds);
     }
