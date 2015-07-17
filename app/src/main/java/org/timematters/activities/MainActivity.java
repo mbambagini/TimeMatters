@@ -371,7 +371,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                 DatePicker datePickerFrom = (DatePicker) findViewById(R.id.datePickerSearchFrom);
                 DatePicker datePickerTo = (DatePicker) findViewById(R.id.datePickerSearchUntil);
                 if ((datePickerFrom != null) && (datePickerTo != null)) {
-
                     Calendar cal = Calendar.getInstance();
                     cal.set(Calendar.YEAR, datePickerFrom.getYear());
                     cal.set(Calendar.MONTH, datePickerFrom.getMonth());
