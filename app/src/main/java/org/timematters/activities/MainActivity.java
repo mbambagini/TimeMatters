@@ -431,22 +431,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         }
     }
 
-    /*
-    public void onSectionAttached(int number) {
-        switch (number) {
-            case 1:
-                mTitle = getString(R.string.title_home);
-                break;
-            case 2:
-                mTitle = getString(R.string.title_activities);
-                break;
-            case 3:
-                mTitle = getString(R.string.title_section3);
-                break;
-        }
-    }
-    */
-
     /**
      * Start the tracking: set values, make the timer start and set the callback
      */
@@ -469,12 +453,9 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             long curr = System.currentTimeMillis();
             total_time += curr - elapsed_time;
             TextView txt = (TextView) findViewById(R.id.txt_time);
-            txt.setText(DateHandler.GetElapsedTime(total_time));
+            if (txt != null)
+                txt.setText(DateHandler.GetElapsedTime(total_time));
             elapsed_time = System.currentTimeMillis();
-/*
-            if (notifier != null)
-                notifier.update(this, total_time);
-*/
         }
     }
 
