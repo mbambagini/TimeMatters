@@ -78,7 +78,6 @@ public class JobStorage {
         } catch (NumberFormatException e) {
             return def;
         }
-        System.out.println("DURATION " + duration + " start " + stop_time + " act " + actual_time);
         return (actual_time - stop_time) + duration;
     }
 

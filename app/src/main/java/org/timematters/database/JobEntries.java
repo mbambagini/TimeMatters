@@ -92,7 +92,6 @@ public class JobEntries {
         values.put(DBHelper.COLUMN_STOP, job.getStop().toString());
         values.put(DBHelper.COLUMN_DURATION, job.getDuration());
         values.put(DBHelper.COLUMN_DESCR, job.getDescr());
-        System.out.println("ADDED: " + job.getStop().toString() + " - " + job.getDuration());
         try {
             db.insert(DBHelper.TABLE_JOBS, null, values);
         } catch (Exception e) {
