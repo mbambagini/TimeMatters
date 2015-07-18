@@ -106,6 +106,11 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
      */
     private Timer timer = new Timer();
 
+    /**
+     * Implementation of the periodic behaviour
+     */
+    private TimerTask timerTask = null;
+
     private Runnable tick = new Runnable() {
         @Override
         public void run() {
@@ -354,6 +359,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                 internal_layout = Layouts.LAYOUT_TRACKING;
                 Intent intent = new Intent(this, SaveActivity.class);
                 intent.putExtra(getString(R.string.elapsed_time_id), total_time);
+                stop_counter();
                 startActivity(intent);
                 break;
             case R.id.btn_pause: //pause the tracking
@@ -436,12 +442,28 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     private void start_counter(long offset) {
         total_time = offset;
         elapsed_time = System.currentTimeMillis();
-        timer.schedule(new TimerTask() {
+        if (timerTask != null) {
+            timerTask.cancel();
+            timer.purge();
+        }
+        timerTask = new TimerTask() {
             @Override
             public void run() {
                 ticker();
             }
-        }, 0, period_1s);
+        };
+        timer.schedule(timerTask, 0, period_1s);
+    }
+
+    /**
+     * Stop the counter if it is present
+     */
+    private void stop_counter () {
+        if (timerTask != null) {
+            timerTask.cancel();
+            timer.purge();
+            timerTask = null;
+        }
     }
 
     /**
