@@ -17,6 +17,36 @@ import java.io.IOException;
  */
 public class JobStorage {
 
+    static public class StoredJobInfo {
+        private long duration;
+        private boolean run_or_pause;
+        private boolean valid;
+
+        public StoredJobInfo () {
+            valid = false;
+            run_or_pause = false;
+            duration = 0;
+        }
+
+        public StoredJobInfo (long d, boolean rop) {
+            duration = d;
+            valid = true;
+            run_or_pause = rop;
+        }
+
+        public boolean isValid () {
+            return valid;
+        }
+
+        public long getDuration () {
+            return duration;
+        }
+
+        public boolean getRun_or_pause () {
+            return run_or_pause;
+        }
+    }
+
     /**
      * File to be used
      */
@@ -24,8 +54,13 @@ public class JobStorage {
 
     /**
      * Save the information permanently
+     *
+     * @param c Context
+     * @param duration total elapsed time
+     * @param actual_time actual time in milliseconds
+     * @param run_or_pause TRUE if the tracking is running, FALSE if it is paused
      */
-    static public boolean setPendingJob(Context c, long duration, long actual_time) {
+    static public boolean setPendingJob(Context c, long duration, long actual_time, boolean run_or_pause) {
         FileOutputStream fos;
         DataOutputStream os;
 
@@ -36,6 +71,7 @@ public class JobStorage {
             os = new DataOutputStream(fos);
             os.writeLong(duration);
             os.writeLong(actual_time);
+            os.writeBoolean(run_or_pause);
             fos.close();
             os.close();
         } catch (FileNotFoundException e) {
@@ -56,29 +92,33 @@ public class JobStorage {
     /**
      * Retrieve the stored information
      */
-    static public long getPendingJob(Context c, long actual_time, long def) {
+    static public StoredJobInfo getPendingJob(Context c, long actual_time) {
         FileInputStream fos;
         DataInputStream is;
         long stop_time;
         long duration;
+        boolean run_or_pause;
 
         try {
             fos = c.openFileInput(FILENAME);
             if (fos == null)
-                return def;
+                return new StoredJobInfo();
             is = new DataInputStream(fos);
             duration = is.readLong();
             stop_time = is.readLong();
+            run_or_pause = is.readBoolean();
             is.close();
             fos.close();
         } catch (FileNotFoundException e) {
-            return def;
+            return new StoredJobInfo();
         } catch (IOException e) {
-            return def;
+            return new StoredJobInfo();
         } catch (NumberFormatException e) {
-            return def;
+            return new StoredJobInfo();
         }
-        return (actual_time - stop_time) + duration;
+        if (run_or_pause)
+            return new StoredJobInfo( (actual_time - stop_time) + duration, true);
+        return new StoredJobInfo(duration, false);
     }
 
 }

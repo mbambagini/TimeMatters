@@ -167,11 +167,14 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
         //check if the tracking must be resumed after the application/activity is closed/suspended
         if (savedInstanceState == null) {
-            long val = JobStorage.getPendingJob(this, System.currentTimeMillis(), -1);
-            if (val != -1) {
-                internal_state = States.STATE_RUNNING;
+            JobStorage.StoredJobInfo val=JobStorage.getPendingJob(this, System.currentTimeMillis());
+            if (val.isValid()) {
+                if (val.getRun_or_pause())
+                    internal_state = States.STATE_RUNNING;
+                else
+                    internal_state = States.STATE_BLOCKED;
                 internal_layout = Layouts.LAYOUT_TRACKING;
-                start_counter(val);
+                start_counter(val.getDuration());
                 JobStorage.removePendingJob(getApplication());
                 Toast.makeText(this, getString(R.string.tst_job_resumed), Toast.LENGTH_LONG).show();
             }
@@ -330,11 +333,12 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             mementoHandler.ignoreAction();
         switch(internal_state) {
             case STATE_RUNNING:
-                JobStorage.setPendingJob(this, total_time, System.currentTimeMillis());
+                JobStorage.setPendingJob(this, total_time, System.currentTimeMillis(), true);
                 notifier = new NotificationWrapper();
                 notifier.create(this, true);
                 break;
             case STATE_BLOCKED:
+                JobStorage.setPendingJob(this, total_time, System.currentTimeMillis(), false);
                 notifier = new NotificationWrapper();
                 notifier.create(this, false);
                 break;
