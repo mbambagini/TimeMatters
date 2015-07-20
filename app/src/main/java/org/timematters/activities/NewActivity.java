@@ -19,7 +19,7 @@ import org.timematters.misc.DateHandler;
 import java.util.Calendar;
 import java.util.Date;
 
-/*!
+/**
  * This Activity lets the user insert manually an activity
  */
 public class NewActivity extends ActionBarActivity {
@@ -65,7 +65,10 @@ public class NewActivity extends ActionBarActivity {
             finish();
     }
 
-    public boolean saveActivity() {
+    /**
+     * An activity is stored permanently: values are read from user inputs
+     */
+    private boolean saveActivity() {
         DatePicker datePicker = (DatePicker) findViewById(R.id.datePickerNewActivity);
         TimePicker timePicker = (TimePicker) findViewById(R.id.timePickerTotalTime);
         EditText note = (EditText) findViewById(R.id.txt_new_note);
