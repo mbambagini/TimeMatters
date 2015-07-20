@@ -13,6 +13,9 @@ public class DateHandler {
 
     /**
      * Convert a duration in milliseconds into a string
+     * 
+     * @param duration time in millisecond to be converted in something readable
+     * @return string with the elapsed time in a human format
      */
     static public String GetElapsedTime(long duration) {
         DecimalFormat formatter = new DecimalFormat("00");
@@ -33,6 +36,9 @@ public class DateHandler {
     /**
      * Convert a date into a string which can be stored within the
      * internal database
+     * 
+     * @param date date to convert
+     * @return string to be stored
      */
     static public String GetSQLDateFormat(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -41,6 +47,9 @@ public class DateHandler {
 
     /**
      * Convert a date into a string according to the pre-defined format
+     * 
+     * @param date date to convert
+     * @return string to be displayed
      */
     static public String GetPreferenceDateFormat(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("E dd/MM/yyyy");
