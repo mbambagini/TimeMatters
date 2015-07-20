@@ -17,6 +17,12 @@ import java.io.IOException;
  */
 public class JobStorage {
 
+    /**
+     * This inner class is used to pass information from the upper
+     * class to other objects which exploit it.
+     * More precisely, the stored information are related to the
+     * pending activity (if present).
+     */
     static public class StoredJobInfo {
         private long duration;
         private boolean run_or_pause;
@@ -59,6 +65,7 @@ public class JobStorage {
      * @param duration total elapsed time
      * @param actual_time actual time in milliseconds
      * @param run_or_pause TRUE if the tracking is running, FALSE if it is paused
+     * @return TRUE if there is no error, FALSE otherwise
      */
     static public boolean setPendingJob(Context c, long duration, long actual_time, boolean run_or_pause) {
         FileOutputStream fos;
@@ -84,6 +91,8 @@ public class JobStorage {
 
     /**
      * Delete the stored information
+     * 
+     * @param c context
      */
     static public void removePendingJob(Context c) {
         c.deleteFile(FILENAME);
@@ -91,6 +100,10 @@ public class JobStorage {
 
     /**
      * Retrieve the stored information
+     * 
+     * @param c context
+     * @param actual_time current time used to update the timer
+     * @return an object with all the retrieved information
      */
     static public StoredJobInfo getPendingJob(Context c, long actual_time) {
         FileInputStream fos;
