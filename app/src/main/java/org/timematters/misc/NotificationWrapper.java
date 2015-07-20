@@ -53,6 +53,8 @@ public class NotificationWrapper {
 
     /**
      * Destroy the notification object, removing it from the notification area
+     * 
+     * @param c context
      */
     public void destroy (Context c) {
         if (mNotificationManager == null)
@@ -60,22 +62,5 @@ public class NotificationWrapper {
         mNotificationManager.cancel(mid);
         mNotificationManager = null;
     }
-
-    /**
-     * Update the content of the notification by writing the actual elapsed time
-     */
-    /*
-    public void update(Context c, long duration) {
-        if (mNotificationManager == null || mBuilder == null)
-            return;
-
-        Intent resultIntent = new Intent(c, MainActivity.class);
-        resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent resultPendingIntent = PendingIntent.getActivity(c, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.setContentIntent(resultPendingIntent);
-        mBuilder.setContentText(c.getResources().getString(R.string.text_elapsed_time) + " " + DateHandler.GetElapsedTime(duration));
-        mNotificationManager.notify(mid, mBuilder.build());
-    }
-    */
 
 }
