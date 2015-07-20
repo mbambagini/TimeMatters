@@ -14,23 +14,35 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class DBHelper extends SQLiteOpenHelper {
 
-    //databases
+    /**
+     * Table name
+     */
     public static final String TABLE_JOBS = "Jobs";
-    //columns
+    
+    //Columns
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_STOP = "_stop";
     public static final String COLUMN_DURATION = "_duration";
     public static final String COLUMN_DESCR = "_descr";
-    //creation queries
+
+    /**
+     * Table creation query
+     */
     private static final String DATABASE_CREATE_JOBS = "create table "
             + TABLE_JOBS + "("
             + COLUMN_ID + " integer primary key autoincrement, "
             + COLUMN_STOP + " date,"
             + COLUMN_DURATION + " integer,"
             + COLUMN_DESCR + " text);";
-    //version
+
+    /**
+     * Database version
+     */
     private static final int DATABASE_VERSION = 1;
-    //file
+    
+    /**
+     * Database file
+     */
     private static final String DATABASE_NAME = "jobs.db";
 
     public DBHelper(Context context) {
