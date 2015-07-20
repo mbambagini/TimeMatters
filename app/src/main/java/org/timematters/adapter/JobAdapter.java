@@ -15,13 +15,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * JobEntry adapter
+ * JobEntry adapter used to feed entry in the list of activity
  */
 public class JobAdapter extends ArrayAdapter<JobEntry> {
 
     private final Activity context;
     private final List<JobEntry> jobs;
 
+    /**
+     * This array is crucial to keep track of the selected items.
+     * Otherwise, we would have problems due to the Android
+     * optimization (the items which are not shown are exploited to show
+     * the visible ones). In other words, we would see several items as
+     * selected even when they are not
+     */
     private final ArrayList<Long> selections = new ArrayList<>();
 
     public JobAdapter(Activity context, int textViewResourceId, List<JobEntry> values) {
@@ -37,6 +44,12 @@ public class JobAdapter extends ArrayAdapter<JobEntry> {
         public TextView id;
     }
 
+    /**
+     * Set the specified item as shown or not shown
+     * 
+     * @param id identifier of the chosen item
+     * @param b TRUE if selected, FALSE otherwise
+     */
     public void setSelection (Long id, boolean b) {
         if (!b) {
             selections.remove(id);
@@ -71,6 +84,9 @@ public class JobAdapter extends ArrayAdapter<JobEntry> {
         return view;
     }
 
+    /**
+     * Unselect all items
+     */
     public void clean () {
         selections.clear();
     }
