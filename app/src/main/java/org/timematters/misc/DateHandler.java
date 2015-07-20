@@ -17,7 +17,7 @@ public class DateHandler {
      * @param duration time in millisecond to be converted in something readable
      * @return string with the elapsed time in a human format
      */
-    static public String GetElapsedTime(long duration) {
+    static public String GetElapsedTime (long duration) {
         DecimalFormat formatter = new DecimalFormat("00");
         DecimalFormat formatterHours = new DecimalFormat();
 
@@ -40,7 +40,7 @@ public class DateHandler {
      * @param date date to convert
      * @return string to be stored
      */
-    static public String GetSQLDateFormat(Date date) {
+    static public String GetSQLDateFormat (Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         return sdf.format(date);
     }
@@ -51,27 +51,15 @@ public class DateHandler {
      * @param date date to convert
      * @return string to be displayed
      */
-    static public String GetPreferenceDateFormat(Date date) {
+    static public String GetPreferenceDateFormat (Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("E dd/MM/yyyy");
         return sdf.format(date);
     }
 
-    /*
-    static public String GetTimeFormat (Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm");
-        return sdf.format(date);
-    }
-
-    static public String GetTimeFormat (int hour, int minute) {
-        DecimalFormat formatter = new DecimalFormat("00");
-        return formatter.format(hour)+":"+formatter.format(minute);
-    }
-    */
-
     /**
      * Return the first day of the actual month
      */
-    static public Date GetMonthStart() {
+    static public Date GetMonthStart () {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.DAY_OF_MONTH, 1);
         return cal.getTime();
@@ -80,14 +68,14 @@ public class DateHandler {
     /**
      * Return the actual date
      */
-    static public Date GetActualDate() {
+    static public Date GetActualDate () {
         return new Date();
     }
 
     /**
      * Return the date of the last sunday
      */
-    static public Date GetLastSunday() {
+    static public Date GetLastSunday () {
         Calendar cal = Calendar.getInstance();
         int day = cal.get(Calendar.DAY_OF_WEEK);
         cal.add(Calendar.DAY_OF_WEEK, Calendar.SUNDAY - day);
