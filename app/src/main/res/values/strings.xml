@@ -21,7 +21,6 @@
     <string name="action_share">Share&#8230;</string>
     <string name="action_save">Save</string>
     <string name="action_new">Add activity</string>
-    <string name="action_settings">Settings</string>
 
     <!-- Simple words -->
     <string name="text_undo">undo</string>

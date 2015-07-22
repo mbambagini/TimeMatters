@@ -69,6 +69,9 @@
     <string name="tst_no_share">Nessuna attivit&#x00E0; da condividere</string>
     <string name="msg_undo_not_possible">Impossibile ripristinare le attivit&#x00E0;</string>
 
+    <!-- Intent's info exchanged -->
+    <string name="elapsed_time_id">elapsed_time_id</string>
+
     <!-- Notification -->
     <!-- <string name="notification_title">TimeMatters - attivit&#x00E0; avviata</string> -->
     <string name="notification_title">TimeMatters</string>
